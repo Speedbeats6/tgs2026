@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>AssoMultiplayer - Live Photobooth Widget</title>
+<script src="shared_sync.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+  body { background: transparent; overflow: hidden; padding: 15px; }
+
+  .widget-container {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(76, 29, 149, 0.95));
+    border: 3px solid #8b5cf6;
+    border-radius: 22px;
+    padding: 18px 26px;
+    color: white;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 510px;
+  }
+
+  .count-box {
+    background: rgba(16, 185, 129, 0.14);
+    border: 2px solid rgba(52, 211, 153, 0.4);
+    border-radius: 16px;
+    padding: 10px 16px;
+    text-align: center;
+    min-width: 96px;
+  }
+
+  .stat-number {
+    font-size: 2.9em;
+    font-weight: 900;
+    color: #a7f3d0;
+    line-height: 1;
+    text-shadow: 0 2px 12px rgba(16, 185, 129, 0.4);
+    transition: transform 0.25s ease;
+  }
+
+  .stat-number.bump {
+    transform: scale(1.18);
+  }
+
+  .badge-free {
+    background: #10b981;
+    color: #022c22;
+    font-size: 0.72em;
+    font-weight: 900;
+    padding: 3px 10px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 5px;
+  }
+
+  .info-block { flex: 1; min-width: 0; }
+  .info-title { font-size: 1.15em; font-weight: 900; color: #f8fafc; }
+  .info-sub { font-size: 0.84em; color: #cbd5e1; margin-top: 2px; }
+  .latest-cosplay {
+    font-size: 0.82em;
+    color: #e9d5ff;
+    font-weight: 700;
+    margin-top: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget-container">
+  <div class="count-box">
+    <div class="stat-number" id="totalCount">0</div>
+  </div>
+  <div class="info-block">
+    <div class="badge-free">100% GRATUIT • LIVE</div>
+    <div class="info-title">📸 Photo Booth Cosplay</div>
+    <div class="info-sub">Cosplayers photographiés au TGS</div>
+    <div class="latest-cosplay" id="latestCosplay">En attente des premiers passages...</div>
+  </div>
+</div>
+
+<script>
+let displayedCount = -1;
+
+function renderFromCacheAndLocal() {
+  const localQueue = TGSSync.getLocalPhotos();
+  const cache = TGSSync.getStatsCache();
+
+  let count = localQueue.length;
+  let latest = localQueue.length > 0 ? localQueue[localQueue.length - 1] : null;
+
+  if (cache && typeof cache.totalCount === 'number') {
+    if (cache.totalCount >= count) {
+      count = cache.totalCount;
+      if (cache.latest) latest = cache.latest;
+    }
+  }
+
+  const numEl = document.getElementById('totalCount');
+  if (count !== displayedCount) {
+    displayedCount = count;
+    numEl.textContent = count;
+    numEl.classList.add('bump');
+    setTimeout(() => numEl.classList.remove('bump'), 300);
+  }
+
+  if (latest && latest.cosplayerName) {
+    const charPart = latest.characterName ? ` (${latest.characterName})` : '';
+    document.getElementById('latestCosplay').textContent = `✨ Dernier : ${latest.cosplayerName}${charPart}`;
+  }
+}
+
+async function pollStats() {
+  renderFromCacheAndLocal();
+  await TGSSync.fetchCloudData('stats');
+  renderFromCacheAndLocal();
+}
+
+TGSSync.onUpdate(renderFromCacheAndLocal);
+pollStats();
+setInterval(pollStats, 8000);
+</script>
+</body>
+</html>

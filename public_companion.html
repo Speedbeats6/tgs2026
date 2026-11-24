@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AssoMultiplayer - Programme & Inscriptions TGS 2026</title>
+<script src="schedule.js"></script>
+<script src="shared_sync.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+  body { background:linear-gradient(135deg, #4c1d95 0%, #3b82f6 100%); color:#0f172a; padding:14px; min-height:100vh; }
+  .container { max-width:540px; margin:0 auto; }
+  .card { background:white; border-radius:22px; padding:20px; margin-bottom:14px; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+  h1 { font-size:1.55em; text-align:center; color:#4c1d95; font-weight:900; margin-bottom:4px; }
+  .subtitle { text-align:center; color:#64748b; font-weight:700; font-size:0.9em; margin-bottom:16px; }
+
+  .day-tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .day-tab {
+    background:#f1f5f9; color:#475569; border:2px solid #e2e8f0; padding:10px;
+    border-radius:12px; font-weight:900; cursor:pointer; text-align:center;
+  }
+  .day-tab.active { background:#4c1d95; color:white; border-color:#7c3aed; }
+
+  .event-badge {
+    background:#f8fafc; padding:12px 14px; border-radius:14px; margin-bottom:9px;
+    border:1px solid #e2e8f0; border-left:5px solid #8b5cf6;
+  }
+  .event-badge.is-reg { border-left-color:#10b981; background:#f0fdf4; }
+  .event-time { font-size:0.8em; color:#64748b; font-weight:800; }
+  .event-title { font-weight:900; font-size:1.02em; margin-top:2px; color:#0f172a; }
+  .event-hosts { font-size:0.8em; color:#6d28d9; font-weight:700; margin-top:3px; }
+  .reg-pill {
+    display:inline-block; background:#10b981; color:#022c22; font-size:0.7em;
+    font-weight:900; padding:2px 8px; border-radius:6px; margin-top:5px;
+  }
+
+  label { font-weight:800; font-size:0.88em; display:block; margin-bottom:5px; color:#1e293b; }
+  input, select, button.submit-btn {
+    width:100%; padding:14px; border-radius:13px; border:2px solid #e2e8f0; margin-bottom:11px; font-size:16px;
+  }
+  input:focus, select:focus { outline:none; border-color:#7c3aed; }
+  button.submit-btn {
+    background:linear-gradient(135deg,#8b5cf6,#2563eb); color:white; font-weight:900; border:none; cursor:pointer;
+    box-shadow:0 6px 18px rgba(124, 58, 237, 0.35);
+  }
+  button.submit-btn:disabled { opacity:0.6; cursor:not-allowed; }
+
+  .toast {
+    display:none; background:#dcfce7; border:2px solid #10b981; color:#065f46;
+    padding:12px; border-radius:12px; font-weight:800; font-size:0.9em; margin-bottom:12px; text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="card">
+    <h1>🎮 ASSOMULTIPLAYER</h1>
+    <div class="subtitle">Toulouse GameShow • 28 & 29 Nov. 2026</div>
+
+    <div id="successToast" class="toast">
+      ✅ Inscription enregistrée ! Présentez-vous devant la scène 5 min avant le début.
+    </div>
+
+    <form id="regForm" onsubmit="registerAttendee(event)">
+      <label for="eventSelect">🎯 Choisissez un Quizz ou Tournoi :</label>
+      <select id="eventSelect" required></select>
+
+      <label for="pseudo">👤 Votre Pseudo / Prénom :</label>
+      <input type="text" id="pseudo" placeholder="Ex: SachaDu31" maxlength="32" required>
+
+      <button type="submit" id="submitBtn" class="submit-btn">🚀 Valider mon inscription</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:1.2em; font-weight:900; color:#4c1d95; margin-bottom:10px;">📅 Programme du Stand</h2>
+    <div class="day-tabs">
+      <div class="day-tab active" id="tabSat" onclick="switchDay('Saturday')">Samedi 28 Nov.</div>
+      <div class="day-tab" id="tabSun" onclick="switchDay('Sunday')">Dimanche 29 Nov.</div>
+    </div>
+    <div id="scheduleList"></div>
+  </div>
+
+</div>
+
+<script>
+let currentDay = (new Date().getDate() === 29 && new Date().getMonth() === 10) ? 'Sunday' : 'Saturday';
+let activeEventsList = [];
+
+function isRegistrable(e) {
+  if (typeof e.registrable === 'boolean') return e.registrable;
+  const t = (e.event || '').toLowerCase();
+  return t.includes('quizz') || t.includes('tournoi') || t.includes('shifumi') || t.includes('blindtest');
+}
+
+function renderAll() {
+  activeEventsList = TGSSync.getEvents();
+  const select = document.getElementById('eventSelect');
+  const prevVal = select.value;
+  select.innerHTML = '';
+
+  activeEventsList.filter(isRegistrable).forEach(e => {
+    const opt = document.createElement('option');
+    const dayFr = e.day === 'Saturday' ? 'Samedi' : 'Dimanche';
+    opt.value = `${e.day} - ${e.startTime} - ${e.event}`;
+    opt.textContent = `[${dayFr} ${e.startTime}] ${e.event}`;
+    select.appendChild(opt);
+  });
+  if (prevVal) select.value = prevVal;
+
+  switchDay(currentDay);
+}
+
+function switchDay(day) {
+  currentDay = day;
+  document.getElementById('tabSat').classList.toggle('active', day === 'Saturday');
+  document.getElementById('tabSun').classList.toggle('active', day === 'Sunday');
+
+  const container = document.getElementById('scheduleList');
+  const filtered = activeEventsList.filter(e => e.day === day);
+
+  container.innerHTML = filtered.map(e => {
+    const reg = isRegistrable(e);
+    return `
+      <div class="event-badge ${reg ? 'is-reg' : ''}">
+        <div class="event-time">${e.startTime} - ${e.endTime}</div>
+        <div class="event-title">${e.event}</div>
+        ${e.hosts ? `<div class="event-hosts">🎙️ ${e.hosts}</div>` : ''}
+        ${reg ? `<span class="reg-pill">📝 Inscription ouverte ci-dessus</span>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+async function registerAttendee(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Envoi en cours...';
+
+  const reg = {
+    id: Date.now(),
+    action: 'register_quiz',
+    event: document.getElementById('eventSelect').value,
+    pseudo: document.getElementById('pseudo').value.trim(),
+    timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  };
+
+  // 1. Save locally (works instantly on same device / offline)
+  const list = JSON.parse(localStorage.getItem('tgsRegistrations') || '[]');
+  list.push(reg);
+  localStorage.setItem('tgsRegistrations', JSON.stringify(list));
+  TGSSync.broadcast('registration_added', reg);
+
+  // 2. Push to Google Apps Script (so Central Hub receives phone registrations over internet!)
+  await TGSSync.pushCloudState(reg);
+
+  document.getElementById('regForm').reset();
+  const toast = document.getElementById('successToast');
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 5000);
+
+  btn.disabled = false;
+  btn.textContent = '🚀 Valider mon inscription';
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  renderAll();
+  // Pull any live schedule updates from Central Hub via Cloud if online
+  await TGSSync.fetchCloudData('schedule');
+  renderAll();
+});
+</script>
+</body>
+</html>
