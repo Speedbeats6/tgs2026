@@ -146,10 +146,20 @@
         document.getElementById('tickerText').textContent = nextEvent ? `⏭️ PROCHAINE ANIMATION À ${nextEvent.startTime} : ${nextEvent.event}` : `📍 Retrouvez-nous tout le week-end au Toulouse GameShow !`;
       }
     }
+    async function pollCloudOverlay() {
+      if (!TGSSync.isOfflineMode()) {
+        await TGSSync.fetchCloudData('all');
+        renderQR();
+        updateOverlay();
+      }
+    }
+
     renderQR();
     updateOverlay();
     TGSSync.onUpdate(() => { renderQR(); updateOverlay(); });
-    setInterval(updateOverlay, 5000);
+    pollCloudOverlay();
+    setInterval(updateOverlay, 3000);
+    setInterval(pollCloudOverlay, 4000);
   </script>
 </body>
 </html>

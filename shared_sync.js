@@ -226,6 +226,12 @@ const TGSSync = {
       if (data && Array.isArray(data.ongoing) && data.ongoing.length > 0 && !localStorage.getItem('tgs_custom_ongoing_dirty')) {
         localStorage.setItem('tgs_custom_ongoing', JSON.stringify(data.ongoing));
       }
+if (data && data.overlay && typeof data.overlay === 'object') {
+        const current = this.getOverlayState();
+        const mergedOverlay = { ...current, ...data.overlay };
+        localStorage.setItem('tgs_overlay_state', JSON.stringify(mergedOverlay));
+        localStorage.setItem('tgs_broadcast_announcement', mergedOverlay.announcement || '');
+      }
       return data;
     } catch (e) {
       return null;
