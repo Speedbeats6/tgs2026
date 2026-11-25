@@ -199,6 +199,7 @@ const TGSSync = {
     try {
       const res = await fetch(`${url}?action=${encodeURIComponent(type)}&_t=${Date.now()}`, {
         method: 'GET',
+	cache: 'no-store',
         redirect: 'follow'
       });
       if (!res.ok) return null;
