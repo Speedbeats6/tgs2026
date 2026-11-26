@@ -190,41 +190,65 @@ const TGSSync = {
     }
   },
 
-  async fetchCloudData(type = 'all') {
-    if (this.isOfflineMode()) return null;
+  fetchCloudData(type = 'all') {
+    if (this.isOfflineMode()) return Promise.resolve(null);
     const url = this.getScriptUrl();
-    if (!url) return null;
-    try {
-      const res = await fetch(`${url}?action=${encodeURIComponent(type)}&_t=${Date.now()}`, {
-        method: 'GET',
-        cache: 'no-store',
-        redirect: 'follow'
-      });
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (data && Array.isArray(data.registrations)) {
-        const deletedIds = new Set(JSON.parse(localStorage.getItem('tgs_deleted_reg_ids') || '[]').map(String));
-        const localRegs = JSON.parse(localStorage.getItem('tgsRegistrations') || '[]');
-        const map = new Map();
-        [...localRegs, ...data.registrations].forEach(r => {
-          const cleanTime = this.formatTimeLabel(r.timestamp);
-          const item = { ...r, timestamp: cleanTime };
-          const key = String(item.id || `${item.event}_${item.pseudo}_${cleanTime}`);
-          if (!deletedIds.has(key)) {
-            map.set(key, item);
-          }
-        });
-        localStorage.setItem('tgsRegistrations', JSON.stringify(Array.from(map.values())));
-      }
-      if (data && Array.isArray(data.events) && data.events.length > 0 && !localStorage.getItem('tgs_custom_events_dirty')) {
-        localStorage.setItem('tgs_custom_events', JSON.stringify(data.events));
-      }
-      if (data && Array.isArray(data.ongoing) && data.ongoing.length > 0 && !localStorage.getItem('tgs_custom_ongoing_dirty')) {
-        localStorage.setItem('tgs_custom_ongoing', JSON.stringify(data.ongoing));
-      }
-      return data;
-    } catch (e) {
-      return null;
-    }
+    if (!url) return Promise.resolve(null);
+
+    return new Promise((resolve) => {
+      const cbName = '__tgsCb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+      const script = document.createElement('script');
+      let done = false;
+
+      const finish = (val) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        if (script.parentNode) script.parentNode.removeChild(script);
+        try { delete window[cbName]; } catch (e) { window[cbName] = undefined; }
+        resolve(val);
+      };
+
+      const timer = setTimeout(() => finish(null), 7000);
+
+      window[cbName] = (data) => {
+        if (!data || typeof data !== 'object') return finish(null);
+
+        if (Array.isArray(data.registrations)) {
+          const deletedIds = new Set(JSON.parse(localStorage.getItem('tgs_deleted_reg_ids') || '[]').map(String));
+          const localRegs = JSON.parse(localStorage.getItem('tgsRegistrations') || '[]');
+          const map = new Map();
+          [...localRegs, ...data.registrations].forEach(r => {
+            const cleanTime = this.formatTimeLabel(r.timestamp);
+            const item = { ...r, timestamp: cleanTime };
+            const key = String(item.id || `${item.event}_${item.pseudo}_${cleanTime}`);
+            if (!deletedIds.has(key)) map.set(key, item);
+          });
+          localStorage.setItem('tgsRegistrations', JSON.stringify(Array.from(map.values())));
+        }
+
+        if (Array.isArray(data.events) && data.events.length > 0 && !localStorage.getItem('tgs_custom_events_dirty')) {
+          localStorage.setItem('tgs_custom_events', JSON.stringify(data.events));
+        }
+
+        if (Array.isArray(data.ongoing) && data.ongoing.length > 0 && !localStorage.getItem('tgs_custom_ongoing_dirty')) {
+          localStorage.setItem('tgs_custom_ongoing', JSON.stringify(data.ongoing));
+        }
+
+        if (data.overlay && typeof data.overlay === 'object') {
+          const current = this.getOverlayState();
+          const merged = { ...current, ...data.overlay };
+          localStorage.setItem('tgs_overlay_state', JSON.stringify(merged));
+          localStorage.setItem('tgs_broadcast_announcement', merged.announcement || '');
+          this.broadcast('overlay_updated', merged);
+        }
+
+        finish(data);
+      };
+
+      script.onerror = () => finish(null);
+      script.src = `${url}?action=${encodeURIComponent(type)}&callback=${cbName}&_t=${Date.now()}`;
+      document.head.appendChild(script);
+    });
   }
 };

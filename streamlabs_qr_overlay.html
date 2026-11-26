@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Standalone Subscription QR Overlay - TGS 2026</title>
+<script src="schedule.js"></script>
+<script src="shared_sync.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+  body { background: transparent; overflow: hidden; height: 100vh; width: 100vw; display: flex; justify-content: flex-end; align-items: flex-end; padding: 36px 44px; }
+  .qr-card {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(76, 29, 149, 0.96));
+    border: 3px solid #a7f3d0;
+    border-radius: 22px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: white;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .qr-card.hidden { opacity: 0; transform: translateY(40px); pointer-events: none; }
+  .qr-box { background: #ffffff; padding: 8px; border-radius: 14px; line-height: 0; display: flex; align-items: center; justify-content: center; }
+  .qr-text { max-width: 210px; }
+  .qr-tag { display: inline-block; background: #10b981; color: #022c22; font-size: 0.72em; font-weight: 900; padding: 3px 9px; border-radius: 6px; text-transform: uppercase; margin-bottom: 6px; }
+  .qr-heading { font-size: 1.15em; font-weight: 900; line-height: 1.2; margin-bottom: 4px; }
+  .qr-sub { font-size: 0.85em; color: #e9d5ff; font-weight: 700; line-height: 1.3; }
+</style>
+</head>
+<body>
+  <div class="qr-card" id="standaloneQrCard">
+    <div class="qr-box" id="qrImageTarget"></div>
+    <div class="qr-text">
+      <div class="qr-tag">📱 Inscriptions Quizz</div>
+      <div class="qr-heading">Scannez & Jouez !</div>
+      <div class="qr-sub">Inscrivez votre pseudo pour les quizz et tournois du stand.</div>
+    </div>
+  </div>
+  <script>
+    function drawQR() {
+      const target = document.getElementById('qrImageTarget');
+      const base = TGSSync.getPublicBaseUrl() || DEFAULT_PUBLIC_BASE_URL;
+      const url = `${base}/public_companion.html`;
+      try {
+        if (typeof qrcode !== 'undefined') {
+          const qr = qrcode(0, 'M');
+          qr.addData(url);
+          qr.make();
+          target.innerHTML = qr.createImgTag(4);
+          return;
+        }
+      } catch (e) {}
+      target.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=148x148&data=${encodeURIComponent(url)}" width="148" height="148" alt="QR Code">`;
+    }
+
+    function syncVisibility() {
+      const state = TGSSync.getOverlayState();
+      document.getElementById('standaloneQrCard').classList.toggle('hidden', state.showQR === false);
+    }
+
+    async function pollCloudQR() {
+      if (!TGSSync.isOfflineMode()) {
+        await TGSSync.fetchCloudData('all');
+        syncVisibility();
+      }
+    }
+
+    drawQR();
+    syncVisibility();
+    TGSSync.onUpdate(() => { drawQR(); syncVisibility(); });
+    pollCloudQR();
+    setInterval(syncVisibility, 2500);
+    setInterval(pollCloudQR, 3500);
+  </script>
+</body>
+</html>

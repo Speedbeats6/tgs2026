@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AssoMultiplayer - Central Hub & Régie TGS 2026</title>
+<title>AssoMultiplayer - Central Hub TGS 2026</title>
 <script src="schedule.js"></script>
 <script src="shared_sync.js"></script>
 <script src="sound_engine.js"></script>
@@ -19,9 +19,9 @@
   .pill-online { background:rgba(16,185,129,0.18); color:#34d399; border:1px solid #059669; }
   .pill-offline { background:rgba(245,158,11,0.18); color:#fbbf24; border:1px solid #d97706; }
   .pill-link { background:#334155; color:#e2e8f0; border:1px solid #475569; cursor:pointer; }
-  .main-grid { flex:1; min-height:0; display:grid; grid-template-columns: 1.05fr 1.1fr 0.95fr; gap:12px; }
+  .main-grid { flex:1; min-height:0; display:grid; grid-template-columns: 1.05fr 1.15fr 1fr; gap:12px; }
   .panel { background:#1e293b; border-radius:16px; padding:14px; border:1px solid #334155; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
-  h2 { color:#a78bfa; font-size:0.98em; margin-bottom:8px; font-weight:900; display:flex; align-items:center; justify-content:space-between; text-transform:uppercase; }
+  h2 { color:#a78bfa; font-size:0.95em; margin-bottom:8px; font-weight:900; display:flex; align-items:center; justify-content:space-between; text-transform:uppercase; }
   .section-box { background:#0f172a; border:1px solid #334155; border-radius:12px; padding:10px; margin-bottom:10px; }
   .scroll-area { flex:1; overflow-y:auto; padding-right:4px; min-height:0; }
   input, select, button { padding:8px 10px; border-radius:9px; border:none; font-weight:700; font-size:0.82em; }
@@ -31,7 +31,7 @@
   .seg-btn { background:#1e293b; border:1px solid #475569; color:#94a3b8; padding:7px 4px; font-size:0.78em; }
   .seg-btn.active { background:#7c3aed; border-color:#a78bfa; color:white; }
   .sound-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-bottom:8px; }
-  .btn-snd { padding:10px 4px; border-radius:10px; font-size:0.76em; font-weight:900; color:white; display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .btn-snd { padding:9px 4px; border-radius:10px; font-size:0.75em; font-weight:900; color:white; display:flex; flex-direction:column; align-items:center; gap:3px; }
   .snd-red { background:linear-gradient(135deg, #ef4444, #991b1b); }
   .snd-green { background:linear-gradient(135deg, #10b981, #065f46); }
   .snd-gold { background:linear-gradient(135deg, #f59e0b, #b45309); }
@@ -48,10 +48,9 @@
   .btn-xs { padding:3px 7px; font-size:0.72em; border-radius:6px; }
   .list-item { background:#0f172a; padding:7px 10px; border-radius:9px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center; font-size:0.8em; border:1px solid #334155; gap:6px; }
   .badge { background:#10b981; color:#042f2e; padding:2px 7px; border-radius:6px; font-size:0.72em; font-weight:900; }
-  .kpi-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
-  .kpi-box { background:#0f172a; border:1px solid #334155; border-radius:10px; padding:8px; text-align:center; }
-  .kpi-val { font-size:1.5em; font-weight:900; color:#34d399; }
-  .kpi-lbl { font-size:0.7em; color:#94a3b8; font-weight:700; text-transform:uppercase; }
+  .summary-grid { display:grid; grid-template-columns:1fr; gap:5px; margin-bottom:8px; max-height:145px; overflow-y:auto; }
+  .summary-row { background:#0f172a; border:1px solid #334155; border-radius:8px; padding:6px 9px; display:flex; justify-content:space-between; align-items:center; font-size:0.76em; cursor:pointer; }
+  .summary-row:hover { border-color:#8b5cf6; }
   .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.75); display:none; align-items:center; justify-content:center; z-index:999; }
   .modal-card { background:#1e293b; border:1px solid #475569; border-radius:16px; padding:20px; width:92%; max-width:520px; }
   @media (max-width: 1100px) { body { height:auto; overflow:auto; } .main-grid { grid-template-columns:1fr; } }
@@ -65,9 +64,9 @@
     <button id="offlineToggleBtn" class="pill pill-link" onclick="toggleOfflineMode()">🌐 Forcer Local: OFF</button>
     <button class="pill pill-link" onclick="syncAllCloud(true)">🔄 Sync Drive</button>
     <a class="pill pill-link" href="streamlabs_lower_third.html" target="_blank">📺 Lower Third</a>
-    <a class="pill pill-link" href="widget_photo_stats.html" target="_blank">📸 Widget Stats</a>
-    <a class="pill pill-link" href="stage_soundboard.html" target="_blank">🎛️ Écran Chrono/Sons</a>
-    <a class="pill pill-link" href="index.html" target="_blank">🖥️ Écran Stand</a>
+    <a class="pill pill-link" href="streamlabs_qr_overlay.html" target="_blank">🔲 QR Overlay</a>
+    <a class="pill pill-link" href="stage_soundboard.html" target="_blank">🎛️ Chrono/Sons</a>
+    <a class="pill pill-link" href="index.html" target="_blank">📅 Écran Planning</a>
     <a class="pill pill-link" href="public_companion.html" target="_blank">📱 Page Public</a>
     <button class="pill pill-link" onclick="openSettings()">⚙️ URLs</button>
   </div>
@@ -75,19 +74,16 @@
 
 <div class="main-grid">
   <div class="panel">
-    <h2>📺 Régie Lower Third Streamlabs</h2>
+    <h2>📺 Contrôle Overlays & Annonces</h2>
     <div class="section-box">
-      <div style="font-size:0.75em; color:#94a3b8; margin-bottom:5px; font-weight:700;">Mode d'affichage de l'Overlay :</div>
+      <div style="font-size:0.75em; color:#94a3b8; margin-bottom:5px; font-weight:700;">Mode Planning / Lower Third :</div>
       <div class="seg-group">
         <button class="seg-btn" id="modeAuto" onclick="setOverlayMode('AUTO')">⏱️ Auto (Heure)</button>
         <button class="seg-btn" id="modeManual" onclick="setOverlayMode('MANUAL')">🎯 Forcer Event</button>
         <button class="seg-btn" id="modeHidden" onclick="setOverlayMode('HIDDEN')">🙈 Masquer</button>
       </div>
       <select id="manualEventSelect" onchange="setManualEvent()" style="display:none;"></select>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px;">
-        <button id="toggleQrOverlayBtn" style="background:#3b82f6; font-size:0.75em;" onclick="toggleOverlayQR()">📱 QR Stream: OFF</button>
-        <button id="toggleStatsWidgetBtn" style="background:#10b981; color:#022c22; font-size:0.75em;" onclick="togglePhotoStatsWidget()">📸 Stats: AFFICHÉ</button>
-      </div>
+      <button id="toggleQrOverlayBtn" style="background:#10b981; color:#022c22; font-size:0.78em; width:100%;" onclick="toggleOverlayQR()">🔲 QR Overlay: ON (Masquer)</button>
     </div>
 
     <h2>📢 Bandeau Annonce Live</h2>
@@ -119,7 +115,7 @@
       </div>
       <div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <span style="font-size:0.74em; color:#94a3b8; font-weight:700;">⏱️ Chrono Scène (affiché en grand sur <code>stage_soundboard.html</code>) :</span>
+          <span style="font-size:0.74em; color:#94a3b8; font-weight:700;">⏱️ Chrono Scène :</span>
           <span class="hub-chrono-readout" id="hubChronoDisplay">--</span>
         </div>
         <div class="timer-bar">
@@ -135,11 +131,11 @@
 
   <div class="panel">
     <div class="seg-group" style="grid-template-columns:1fr 1fr; margin-bottom:10px;">
-      <button class="seg-btn active" id="tabCol2Schedule" onclick="switchCol2Tab('SCHEDULE')">📅 Planning Horaire</button>
+      <button class="seg-btn active" id="tabCol2Schedule" onclick="switchCol2Tab('SCHEDULE')">📅 Contrôle Planning</button>
       <button class="seg-btn" id="tabCol2Ongoing" onclick="switchCol2Tab('ONGOING')">🔄 Activités en Continu</button>
     </div>
     <div id="viewCol2Schedule" style="display:flex; flex-direction:column; flex:1; min-height:0;">
-      <h2><span>📅 Planning & Animation en cours</span><button class="btn-xs" style="background:#475569;" onclick="resetScheduleToDefault()">↺ Reset JS</button></h2>
+      <h2><span>📅 Planning & Animation Live</span><button class="btn-xs" style="background:#475569;" onclick="resetScheduleToDefault()">↺ Reset JS</button></h2>
       <div class="section-box">
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;">
           <select id="newDay"><option value="Saturday">Samedi 28</option><option value="Sunday">Dimanche 29</option></select>
@@ -175,26 +171,23 @@
   </div>
 
   <div class="panel">
-    <h2><span>📱 Compagnon Public & Inscriptions</span><button class="btn-xs" style="background:#3b82f6;" onclick="toggleQRModal()">QR Code</button></h2>
+    <h2><span>🎯 Inscriptions par Quizz</span><button class="btn-xs" style="background:#3b82f6;" onclick="toggleQRModal()">QR Code</button></h2>
     <div id="qrContainer" class="section-box" style="display:none; text-align:center;">
       <div style="background:white; padding:8px; border-radius:10px; display:inline-block;" id="qrcode"></div>
       <div id="qrUrlPreview" style="font-size:0.68em; color:#94a3b8; margin-top:4px; word-break:break-all;"></div>
     </div>
+
+    <div class="summary-grid" id="quizSummaryCounts"></div>
+
     <div class="section-box" style="padding:8px;">
-      <select id="eventFilter" onchange="renderRegistrations()" style="margin-bottom:6px;"><option value="ALL">-- Toutes les animations --</option></select>
+      <select id="eventFilter" onchange="renderRegistrations()" style="margin-bottom:6px;"><option value="ALL">-- Tous les quizz / animations --</option></select>
       <div style="display:flex; gap:5px;">
         <button style="background:#475569; flex:1; font-size:0.74em;" onclick="toggleSelectAll()">☑️ Tout</button>
         <button style="background:#f59e0b; color:#0f172a; flex:1.3; font-size:0.74em;" onclick="raffleSelected()">🎲 Tirage</button>
-        <button style="background:#ef4444; flex:1; font-size:0.74em;" onclick="deleteSelectedRegistrations()">🗑️ Suppr. coche</button>
+        <button style="background:#ef4444; flex:1; font-size:0.74em;" onclick="deleteSelectedRegistrations()">🗑️ Suppr.</button>
       </div>
     </div>
-    <div class="scroll-area" id="regFeed" style="max-height:42%;"></div>
-    <h2 style="margin-top:10px;">📸 Stats Photobooth</h2>
-    <div class="kpi-row">
-      <div class="kpi-box"><div class="kpi-val" id="hubCloudPhotoCount">0</div><div class="kpi-lbl">Total Passages</div></div>
-      <div class="kpi-box"><div class="kpi-val" style="color:#60a5fa;" id="hubLocalPhotoCount">0</div><div class="kpi-lbl">Logs Locaux</div></div>
-    </div>
-    <div class="scroll-area" id="photoFeed" style="max-height:24%;"></div>
+    <div class="scroll-area" id="regFeed"></div>
   </div>
 </div>
 
@@ -202,7 +195,7 @@
   <div class="modal-card">
     <h2 style="margin-bottom:12px;">⚙️ Configuration URLs</h2>
     <label style="font-size:0.8em; color:#cbd5e1; display:block; margin-bottom:4px;">URL de base publique (GitHub Pages) :</label>
-    <input type="text" id="cfgPublicUrl" placeholder="https://tonpseudo.github.io/tgs2026">
+    <input type="text" id="cfgPublicUrl" placeholder="https://speedbeats6.github.io/tgs2026">
     <label style="font-size:0.8em; color:#cbd5e1; display:block; margin-bottom:4px;">URL Google Apps Script :</label>
     <input type="text" id="cfgGasUrl" placeholder="https://script.google.com/macros/s/.../exec">
     <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
@@ -217,7 +210,7 @@ let localEventsList = [], localOngoingList = [], allSelected = false, hubChronoI
 document.addEventListener('DOMContentLoaded', () => {
   localEventsList = TGSSync.getEvents();
   localOngoingList = TGSSync.getOngoingActivities();
-  refreshScheduleUI(); refreshOngoingUI(); refreshOverlayUI(); renderRegistrations(); refreshPhotoStatsUI(); generateQRCode();
+  refreshScheduleUI(); refreshOngoingUI(); refreshOverlayUI(); renderRegistrations(); generateQRCode();
   updateOnlineStatus(); refreshOfflineButtonUI();
   window.addEventListener('online', () => { updateOnlineStatus(); if (!TGSSync.isOfflineMode()) syncAllCloud(false); });
   window.addEventListener('offline', updateOnlineStatus);
@@ -226,31 +219,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (type === 'ongoing_updated' || type === 'tgs_custom_ongoing') { localOngoingList = TGSSync.getOngoingActivities(); refreshOngoingUI(); }
     if (type === 'overlay_updated' || type === 'tgs_overlay_state') refreshOverlayUI();
     if (type === 'offline_mode_changed') { updateOnlineStatus(); refreshOfflineButtonUI(); }
-    renderRegistrations(); refreshPhotoStatsUI();
+    renderRegistrations();
   });
   if (!TGSSync.isOfflineMode()) syncAllCloud(false);
-  setInterval(() => { if (!TGSSync.isOfflineMode()) syncAllCloud(false); }, 15000);
-  setInterval(() => { renderRegistrations(); refreshPhotoStatsUI(); refreshScheduleUI(); }, 4000);
+  setInterval(() => { if (!TGSSync.isOfflineMode()) syncAllCloud(false); }, 8000);
+  setInterval(() => { renderRegistrations(); refreshScheduleUI(); }, 3500);
 });
 function startHubChrono(seconds) {
-  stopHubChrono(false);
-  TGSSync.triggerTimer(seconds);
-  let left = seconds;
-  const el = document.getElementById('hubChronoDisplay');
-  el.textContent = left + 's';
-  hubChronoInterval = setInterval(() => {
-    left--;
-    if (left > 0) el.textContent = left + 's';
-    else { stopHubChrono(false); el.textContent = '0s'; }
-  }, 1000);
+  stopHubChrono(false); TGSSync.triggerTimer(seconds);
+  let left = seconds; const el = document.getElementById('hubChronoDisplay'); el.textContent = left + 's';
+  hubChronoInterval = setInterval(() => { left--; if (left > 0) el.textContent = left + 's'; else { stopHubChrono(false); el.textContent = '0s'; } }, 1000);
 }
 function stopHubChrono(sendCmd = true) {
   if (hubChronoInterval) clearInterval(hubChronoInterval);
   hubChronoInterval = null;
-  if (sendCmd) {
-    TGSSync.stopTimer();
-    document.getElementById('hubChronoDisplay').textContent = '--';
-  }
+  if (sendCmd) { TGSSync.stopTimer(); document.getElementById('hubChronoDisplay').textContent = '--'; }
 }
 function updateOnlineStatus() {
   const pill = document.getElementById('netStatusPill');
@@ -262,14 +245,11 @@ function refreshOfflineButtonUI() {
   if (forcedOff) { btn.style.background = '#f59e0b'; btn.style.color = '#0f172a'; btn.textContent = '🟠 Forcer Local: ON'; }
   else { btn.style.background = '#334155'; btn.style.color = '#e2e8f0'; btn.textContent = '🌐 Forcer Local: OFF'; }
 }
-function toggleOfflineMode() {
-  TGSSync.setOfflineMode(localStorage.getItem('tgs_force_offline') !== '1');
-  refreshOfflineButtonUI(); updateOnlineStatus();
-}
+function toggleOfflineMode() { TGSSync.setOfflineMode(localStorage.getItem('tgs_force_offline') !== '1'); refreshOfflineButtonUI(); updateOnlineStatus(); }
 async function syncAllCloud(manual = false) {
-  if (TGSSync.isOfflineMode()) { if (manual) alert('🟠 Mode Local actif : désactivez "Forcer Local" pour synchroniser avec Google Sheets.'); return; }
+  if (TGSSync.isOfflineMode()) { if (manual) alert('🟠 Mode Local actif.'); return; }
   const data = await TGSSync.fetchCloudData('all');
-  if (data) { renderRegistrations(); refreshPhotoStatsUI(); if (manual) alert('✅ Synchronisation réussie !'); }
+  if (data) { renderRegistrations(); refreshOverlayUI(); if (manual) alert('✅ Synchronisation réussie !'); }
   else if (manual) alert('⚠️ Connexion Google Sheets indisponible.');
 }
 function refreshOverlayUI() {
@@ -281,11 +261,8 @@ function refreshOverlayUI() {
   sel.style.display = st.mode === 'MANUAL' ? 'block' : 'none';
   if (st.manualEventId) sel.value = st.manualEventId;
   const qrBtn = document.getElementById('toggleQrOverlayBtn');
-  if (st.showQR) { qrBtn.style.background = '#10b981'; qrBtn.style.color = '#022c22'; qrBtn.textContent = '📱 QR Stream: ON (Masquer)'; }
-  else { qrBtn.style.background = '#3b82f6'; qrBtn.style.color = 'white'; qrBtn.textContent = '📱 QR Stream: OFF (Afficher)'; }
-  const statsBtn = document.getElementById('toggleStatsWidgetBtn');
-  if (st.showPhotoStats === false) { statsBtn.style.background = '#475569'; statsBtn.style.color = 'white'; statsBtn.textContent = '📸 Stats: MASQUÉ'; }
-  else { statsBtn.style.background = '#10b981'; statsBtn.style.color = '#022c22'; statsBtn.textContent = '📸 Stats: AFFICHÉ'; }
+  if (st.showQR !== false) { qrBtn.style.background = '#10b981'; qrBtn.style.color = '#022c22'; qrBtn.textContent = '🔲 QR Overlay: ON (Masquer)'; }
+  else { qrBtn.style.background = '#3b82f6'; qrBtn.style.color = 'white'; qrBtn.textContent = '🔲 QR Overlay: OFF (Afficher)'; }
   const annInput = document.getElementById('announceMsg');
   if (document.activeElement !== annInput) annInput.value = st.announcement || '';
 }
@@ -295,8 +272,7 @@ function setOverlayMode(mode) {
   TGSSync.setOverlayState(patch); refreshOverlayUI();
 }
 function setManualEvent() { TGSSync.setOverlayState({ mode: 'MANUAL', manualEventId: Number(document.getElementById('manualEventSelect').value) }); }
-function toggleOverlayQR() { const st = TGSSync.getOverlayState(); TGSSync.setOverlayState({ showQR: !st.showQR }); refreshOverlayUI(); }
-function togglePhotoStatsWidget() { const st = TGSSync.getOverlayState(); TGSSync.setOverlayState({ showPhotoStats: st.showPhotoStats === false }); refreshOverlayUI(); }
+function toggleOverlayQR() { const st = TGSSync.getOverlayState(); TGSSync.setOverlayState({ showQR: st.showQR === false }); refreshOverlayUI(); }
 function sendAnnouncement() { TGSSync.setOverlayState({ announcement: document.getElementById('announceMsg').value.trim() }); }
 function clearAnnouncement() { document.getElementById('announceMsg').value = ''; TGSSync.setOverlayState({ announcement: '' }); }
 function fireSound(soundId) { if (!document.getElementById('muteHubAudio').checked) stageAudio.play(soundId); TGSSync.triggerSound(soundId, 0.9); }
@@ -318,12 +294,12 @@ function isEventCurrentlyHappening(e) {
 function refreshScheduleUI() {
   const feed = document.getElementById('scheduleFeed'), manualSel = document.getElementById('manualEventSelect'), filterSel = document.getElementById('eventFilter');
   const prevM = manualSel.value, prevF = filterSel.value;
-  manualSel.innerHTML = ''; filterSel.innerHTML = '<option value="ALL">-- Toutes les animations --</option>';
+  manualSel.innerHTML = ''; filterSel.innerHTML = '<option value="ALL">-- Tous les quizz / animations --</option>';
   feed.innerHTML = localEventsList.map((e, idx) => {
     const live = isEventCurrentlyHappening(e), reg = isEventRegistrable(e);
     const optM = document.createElement('option'); optM.value = e.id; optM.textContent = `[${e.day === 'Saturday' ? 'Sam' : 'Dim'}] ${e.startTime} - ${e.event}`; manualSel.appendChild(optM);
     if (reg) { const optF = document.createElement('option'); optF.value = `${e.day} - ${e.startTime} - ${e.event}`; optF.textContent = `[${e.day === 'Saturday' ? 'Sam' : 'Dim'}] ${e.startTime} - ${e.event}`; filterSel.appendChild(optF); }
-    return `<div class="schedule-card ${live ? 'is-live' : ''}"><div><div style="font-size:0.75em; color:${live ? '#34d399' : '#a78bfa'}; font-weight:800;">${live ? '🔴 EN COURS • ' : ''}${e.day === 'Saturday' ? 'Samedi' : 'Dimanche'} ${e.startTime} - ${e.endTime}${reg ? ' • <span style="color:#60a5fa;">📝 Quiz ON</span>' : ''}</div><div style="font-weight:900; margin-top:2px;">${e.event}</div>${e.hosts ? `<div style="font-size:0.76em; color:#94a3b8;">👥 ${e.hosts}</div>` : ''}<div style="font-size:0.7em; color:#64748b;">🖼️ Logo : ${e.logo ? e.logo : 'AssoMultiplayer'}</div></div><div style="display:flex; flex-direction:column; gap:4px;"><button class="btn-xs" style="background:#7c3aed;" onclick="forceEventOnOverlay(${e.id})">📺 Live</button><button class="btn-xs" style="background:#0284c7;" onclick="editEventLogo(${idx})">🖼️</button><button class="btn-xs" style="background:#ef4444;" onclick="deleteEvent(${idx})">🗑️</button></div></div>`;
+    return `<div class="schedule-card ${live ? 'is-live' : ''}"><div><div style="font-size:0.75em; color:${live ? '#34d399' : '#a78bfa'}; font-weight:800;">${live ? '🔴 EN COURS • ' : ''}${e.day === 'Saturday' ? 'Samedi' : 'Dimanche'} ${e.startTime} - ${e.endTime}${reg ? ' • <span style="color:#60a5fa;">📝 Quiz ON</span>' : ''}</div><div style="font-weight:900; margin-top:2px;">${e.event}</div>${e.hosts ? `<div style="font-size:0.76em; color:#94a3b8;">👥 ${e.hosts}</div>` : ''}</div><div style="display:flex; flex-direction:column; gap:4px;"><button class="btn-xs" style="background:#7c3aed;" onclick="forceEventOnOverlay(${e.id})">📺 Live</button><button class="btn-xs" style="background:#ef4444;" onclick="deleteEvent(${idx})">🗑️</button></div></div>`;
   }).join('');
   if (prevM) manualSel.value = prevM;
   if (prevF) filterSel.value = prevF;
@@ -336,12 +312,6 @@ function addEvent() {
   localStorage.setItem('tgs_custom_events_dirty', '1'); TGSSync.saveEvents(localEventsList); refreshScheduleUI();
   ['newStart','newEnd','newEventName','newHosts','newLogo'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('newAllowReg').checked = false;
-}
-function editEventLogo(index) {
-  const next = prompt("Logo hôte/event (ex: logos/jakssdio.png — vide = Logo Asso) :", localEventsList[index].logo || '');
-  if (next === null) return;
-  localEventsList[index].logo = next.trim() || null;
-  localStorage.setItem('tgs_custom_events_dirty', '1'); TGSSync.saveEvents(localEventsList); refreshScheduleUI();
 }
 function switchCol2Tab(tab) {
   const isSched = tab === 'SCHEDULE';
@@ -382,88 +352,81 @@ function deleteEvent(index) {
 function resetScheduleToDefault() {
   if (confirm('Réinitialiser le planning ?')) { localStorage.removeItem('tgs_custom_events'); localStorage.removeItem('tgs_custom_events_dirty'); localEventsList = TGSSync.getEvents(); TGSSync.saveEvents(localEventsList); refreshScheduleUI(); }
 }
-function getCompanionUrl() { const base = TGSSync.getPublicBaseUrl(); return base ? `${base}/public_companion.html` : window.location.href.replace('central_hub.html', 'public_companion.html'); }
+function getCompanionUrl() { const base = TGSSync.getPublicBaseUrl() || DEFAULT_PUBLIC_BASE_URL; return `${base}/public_companion.html`; }
 function generateQRCode() {
   try { const url = getCompanionUrl(), qr = qrcode(0, 'M'); qr.addData(url); qr.make(); document.getElementById('qrcode').innerHTML = qr.createImgTag(4); document.getElementById('qrUrlPreview').textContent = url; } catch (e) {}
 }
 function toggleQRModal() { const box = document.getElementById('qrContainer'); generateQRCode(); box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
-
+function renderQuizCounts(regs) {
+  const summaryBox = document.getElementById('quizSummaryCounts');
+  if (!summaryBox) return;
+  const counts = new Map();
+  regs.forEach(r => { const key = String(r.event || 'Autre'); counts.set(key, (counts.get(key) || 0) + 1); });
+  if (counts.size === 0) {
+    summaryBox.innerHTML = '<div class="summary-row"><span style="color:#94a3b8;">Aucune inscription enregistrée</span><span class="badge" style="background:#334155; color:#e2e8f0;">0</span></div>';
+    return;
+  }
+  summaryBox.innerHTML = Array.from(counts.entries()).map(([evName, cnt]) => `
+    <div class="summary-row" onclick="filterByQuiz('${evName.replace(/'/g, "\'")}')">
+      <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:82%; font-weight:700;">${evName}</span>
+      <span class="badge">${cnt} inscrit${cnt > 1 ? 's' : ''}</span>
+    </div>
+  `).join('');
+}
+function filterByQuiz(evName) {
+  const sel = document.getElementById('eventFilter');
+  if (!Array.from(sel.options).some(o => o.value === evName)) {
+    const opt = document.createElement('option'); opt.value = evName; opt.textContent = evName; sel.appendChild(opt);
+  }
+  sel.value = evName; renderRegistrations();
+}
 function renderRegistrations() {
   const selectedEvent = document.getElementById('eventFilter').value;
   const regs = JSON.parse(localStorage.getItem('tgsRegistrations') || '[]');
+  renderQuizCounts(regs);
   const regFeed = document.getElementById('regFeed');
   const filtered = selectedEvent === 'ALL' ? regs : regs.filter(r => r.event === selectedEvent);
-  if (filtered.length === 0) {
-    regFeed.innerHTML = '<div style="text-align:center; color:#64748b; font-size:0.8em; padding:15px;">Aucune inscription.</div>';
-    return;
-  }
-  regFeed.innerHTML = filtered.slice().reverse().map((r, revIdx) => {
+  if (filtered.length === 0) { regFeed.innerHTML = '<div style="text-align:center; color:#64748b; font-size:0.8em; padding:15px;">Aucune inscription pour ce filtre.</div>'; return; }
+  regFeed.innerHTML = filtered.slice().reverse().map((r) => {
     const cleanTime = TGSSync.formatTimeLabel(r.timestamp);
     const regKey = String(r.id || `${r.event}_${r.pseudo}_${cleanTime}`);
     return `
       <div class="list-item">
         <div style="display:flex; align-items:center; gap:8px; min-width:0;">
           <input type="checkbox" class="participant-checkbox" data-key="${regKey}" data-id="${r.id || ''}" data-pseudo="${r.pseudo}" data-event="${r.event}" style="width:16px; height:16px; margin:0; flex-shrink:0;">
-          <div style="min-width:0;">
-            <strong>${r.pseudo}</strong>
-            <div style="font-size:0.75em; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.event}</div>
-          </div>
+          <div style="min-width:0;"><strong>${r.pseudo}</strong><div style="font-size:0.75em; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.event}</div></div>
         </div>
         <div style="display:flex; align-items:center; gap:5px; flex-shrink:0;">
           <span class="badge" style="background:#3b82f6; color:white;">${cleanTime}</span>
-          <button class="btn-xs" style="background:#ef4444;" onclick="deleteSingleRegistration('${regKey.replace(/'/g, "\'")}', '${String(r.id || '').replace(/'/g, "\'")}', '${String(r.pseudo).replace(/'/g, "\'")}', '${String(r.event).replace(/'/g, "\'")}')" title="Supprimer cette inscription">🗑️</button>
+          <button class="btn-xs" style="background:#ef4444;" onclick="deleteSingleRegistration('${regKey.replace(/'/g, "\'")}', '${String(r.id || '').replace(/'/g, "\'")}', '${String(r.pseudo).replace(/'/g, "\'")}', '${String(r.event).replace(/'/g, "\'")}')" title="Supprimer">🗑️</button>
         </div>
       </div>
     `;
   }).join('');
 }
-
 async function deleteSingleRegistration(regKey, regId, pseudo, eventName) {
   if (!confirm(`Supprimer l'inscription de "${pseudo}" ?`)) return;
   const regs = JSON.parse(localStorage.getItem('tgsRegistrations') || '[]');
-  const next = regs.filter(r => {
-    const k = String(r.id || `${r.event}_${r.pseudo}_${TGSSync.formatTimeLabel(r.timestamp)}`);
-    return k !== regKey;
-  });
-  localStorage.setItem('tgsRegistrations', JSON.stringify(next));
-
+  localStorage.setItem('tgsRegistrations', JSON.stringify(regs.filter(r => String(r.id || `${r.event}_${r.pseudo}_${TGSSync.formatTimeLabel(r.timestamp)}`) !== regKey)));
   const deletedIds = new Set(JSON.parse(localStorage.getItem('tgs_deleted_reg_ids') || '[]').map(String));
-  deletedIds.add(regKey);
-  if (regId) deletedIds.add(String(regId));
+  deletedIds.add(regKey); if (regId) deletedIds.add(String(regId));
   localStorage.setItem('tgs_deleted_reg_ids', JSON.stringify(Array.from(deletedIds)));
-
   renderRegistrations();
   await TGSSync.pushCloudState({ action: 'delete_registration', id: regId, pseudo, event: eventName });
 }
-
 async function deleteSelectedRegistrations() {
   const checked = Array.from(document.querySelectorAll('.participant-checkbox:checked'));
   if (checked.length === 0) return alert('⚠️ Cochez au moins une inscription à supprimer.');
   if (!confirm(`Supprimer ${checked.length} inscription(s) sélectionnée(s) ?`)) return;
-
   const keysToRemove = new Set(checked.map(cb => cb.getAttribute('data-key')));
   const regs = JSON.parse(localStorage.getItem('tgsRegistrations') || '[]');
-  const next = regs.filter(r => {
-    const k = String(r.id || `${r.event}_${r.pseudo}_${TGSSync.formatTimeLabel(r.timestamp)}`);
-    return !keysToRemove.has(k);
-  });
-  localStorage.setItem('tgsRegistrations', JSON.stringify(next));
-
+  localStorage.setItem('tgsRegistrations', JSON.stringify(regs.filter(r => !keysToRemove.has(String(r.id || `${r.event}_${r.pseudo}_${TGSSync.formatTimeLabel(r.timestamp)}`)))));
   const deletedIds = new Set(JSON.parse(localStorage.getItem('tgs_deleted_reg_ids') || '[]').map(String));
   keysToRemove.forEach(k => deletedIds.add(k));
   localStorage.setItem('tgs_deleted_reg_ids', JSON.stringify(Array.from(deletedIds)));
-
   renderRegistrations();
-  for (const cb of checked) {
-    await TGSSync.pushCloudState({
-      action: 'delete_registration',
-      id: cb.getAttribute('data-id'),
-      pseudo: cb.getAttribute('data-pseudo'),
-      event: cb.getAttribute('data-event')
-    });
-  }
+  for (const cb of checked) await TGSSync.pushCloudState({ action: 'delete_registration', id: cb.getAttribute('data-id'), pseudo: cb.getAttribute('data-pseudo'), event: cb.getAttribute('data-event') });
 }
-
 function toggleSelectAll() { allSelected = !allSelected; document.querySelectorAll('.participant-checkbox').forEach(cb => cb.checked = allSelected); }
 function raffleSelected() {
   const checked = Array.from(document.querySelectorAll('.participant-checkbox:checked'));
@@ -474,16 +437,6 @@ function raffleSelected() {
 
 🏆 ${winner.pseudo}
 🎮 ${winner.event}`); }, 2450);
-}
-function refreshPhotoStatsUI() {
-  const localPhotos = TGSSync.getLocalPhotos(), cache = TGSSync.getStatsCache(), offline = TGSSync.isOfflineMode();
-  const totalCount = (!offline && cache && typeof cache.totalCount === 'number') ? Math.max(cache.totalCount, localPhotos.length) : localPhotos.length;
-  document.getElementById('hubCloudPhotoCount').textContent = totalCount;
-  document.getElementById('hubLocalPhotoCount').textContent = localPhotos.length;
-  const recentList = (!offline && cache && Array.isArray(cache.recent) && cache.recent.length > 0) ? cache.recent : localPhotos.slice(-10).reverse();
-  const photoFeed = document.getElementById('photoFeed');
-  if (recentList.length === 0) { photoFeed.innerHTML = '<div style="text-align:center; color:#64748b; font-size:0.78em; padding:10px;">Aucun log.</div>'; return; }
-  photoFeed.innerHTML = recentList.map(p => `<div class="list-item"><div><strong>${p.cosplayerName || 'Cosplayer'}</strong> ${p.characterName ? `(${p.characterName})` : ''}<div style="font-size:0.74em; color:#94a3b8;">📷 ${p.photographerName || ''} • #${p.startNumber || ''}</div></div><span class="badge">OK</span></div>`).join('');
 }
 function openSettings() { document.getElementById('cfgPublicUrl').value = TGSSync.getPublicBaseUrl(); document.getElementById('cfgGasUrl').value = TGSSync.getScriptUrl(); document.getElementById('settingsModal').style.display = 'flex'; }
 function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }

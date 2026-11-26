@@ -120,7 +120,7 @@ async function registerAttendee(e) {
   if (targetEv) { const cardEl = document.getElementById(`sched-ev-${targetEv.id}`); if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   btn.disabled = false; btn.textContent = '🚀 Valider mon inscription';
 }
-document.addEventListener('DOMContentLoaded', async () => { renderAll(); if (!TGSSync.isOfflineMode()) { await TGSSync.fetchCloudData('schedule'); renderAll(); } });
+document.addEventListener('DOMContentLoaded', async () => { renderAll(); if (!TGSSync.isOfflineMode()) { await TGSSync.fetchCloudData('all'); renderAll(); } });
 </script>
 </body>
 </html>

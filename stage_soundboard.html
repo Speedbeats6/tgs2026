@@ -10,23 +10,14 @@
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;900&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
   body { background:#0f172a; color:white; padding:18px; min-height:100vh; display:flex; flex-direction:column; gap:16px; }
-
   .header-bar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
   h1 { color:#a78bfa; font-size:1.5em; font-weight:900; }
   .vol-box { display:flex; align-items:center; gap:8px; background:#1e293b; padding:8px 14px; border-radius:12px; border:1px solid #334155; font-size:0.85em; }
-
   .grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; flex:1; }
   @media(max-width: 768px) { .grid { grid-template-columns:repeat(2, 1fr); } }
-
-  .btn-sound {
-    border:none; border-radius:18px; font-size:1.15em; font-weight:900; color:white;
-    cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
-    padding:20px 10px; transition:transform 0.08s, filter 0.15s; box-shadow:0 8px 20px rgba(0,0,0,0.35);
-    border:2px solid rgba(255,255,255,0.12);
-  }
+  .btn-sound { border:none; border-radius:18px; font-size:1.15em; font-weight:900; color:white; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:20px 10px; transition:transform 0.08s, filter 0.15s; box-shadow:0 8px 20px rgba(0,0,0,0.35); border:2px solid rgba(255,255,255,0.12); }
   .btn-sound span.emoji { font-size:2em; }
   .btn-sound:active, .btn-sound.triggered { transform:scale(0.94); filter:brightness(1.25); }
-
   .c-red { background:linear-gradient(135deg, #ef4444, #991b1b); }
   .c-green { background:linear-gradient(135deg, #10b981, #065f46); }
   .c-gold { background:linear-gradient(135deg, #f59e0b, #b45309); }
@@ -35,7 +26,6 @@
   .c-slate { background:linear-gradient(135deg, #64748b, #334155); }
   .c-cyan { background:linear-gradient(135deg, #06b6d4, #0e7490); }
   .c-blue { background:linear-gradient(135deg, #3b82f6, #1d4ed8); }
-
   .timer-section { background:#1e293b; padding:18px; border-radius:20px; text-align:center; border:2px solid #334155; }
   .timer-display { font-size:3.8em; font-weight:900; color:#f59e0b; margin:6px 0; line-height:1; }
   .timer-controls { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
@@ -43,15 +33,10 @@
 </style>
 </head>
 <body onclick="stageAudio.init()">
-
 <div class="header-bar">
   <h1>🎛️ Soundboard Scène AssoMultiplayer</h1>
-  <div class="vol-box">
-    <span>🔊 Volume :</span>
-    <input type="range" min="0" max="1" step="0.05" value="0.85" oninput="stageAudio.setVolume(parseFloat(this.value))">
-  </div>
+  <div class="vol-box"><span>🔊 Volume :</span><input type="range" min="0" max="1" step="0.05" value="0.85" oninput="stageAudio.setVolume(parseFloat(this.value))"></div>
 </div>
-
 <div class="grid">
   <button id="btn-buzzer" class="btn-sound c-red" onclick="playLocal('buzzer')"><span class="emoji">❌</span>BUZZER</button>
   <button id="btn-correct" class="btn-sound c-green" onclick="playLocal('correct')"><span class="emoji">✅</span>BONNE RÉPONSE</button>
@@ -62,7 +47,6 @@
   <button id="btn-coin" class="btn-sound c-cyan" onclick="playLocal('coin')"><span class="emoji">🪙</span>COIN 8-BIT</button>
   <button id="btn-applause" class="btn-sound c-blue" onclick="playLocal('applause')"><span class="emoji">👏</span>APPLAUDISSEMENTS</button>
 </div>
-
 <div class="timer-section">
   <div style="font-size:0.9em; color:#94a3b8; font-weight:900;">⏱️ CHRONO SCÈNE (Pilotable depuis Central Hub)</div>
   <div class="timer-display" id="timerDisplay">10</div>
@@ -74,81 +58,44 @@
     <button class="btn-timer" style="background:#ef4444;" onclick="stopTimer()">⏹️ STOP</button>
   </div>
 </div>
-
 <script>
-let lastSoundCmdId = null;
-let lastTimerCmdId = null;
-let timerInterval = null;
-
+let lastSoundCmdId = null, lastTimerCmdId = null, timerInterval = null;
 function playLocal(soundId, vol = null) {
   stageAudio.play(soundId, vol);
   const btn = document.getElementById('btn-' + soundId);
-  if (btn) {
-    btn.classList.add('triggered');
-    setTimeout(() => btn.classList.remove('triggered'), 220);
-  }
+  if (btn) { btn.classList.add('triggered'); setTimeout(() => btn.classList.remove('triggered'), 220); }
 }
-
 function startTimer(seconds) {
   stopTimer();
   let left = seconds;
   const disp = document.getElementById('timerDisplay');
-  disp.textContent = left;
-  disp.style.color = '#f59e0b';
-
+  disp.textContent = left; disp.style.color = '#f59e0b';
   timerInterval = setInterval(() => {
-    left--;
-    disp.textContent = left;
-    if (left > 3) {
-      stageAudio.play('tick');
-    } else if (left > 0) {
-      disp.style.color = '#ef4444';
-      stageAudio.play('tick_urgent');
-    } else {
-      stopTimer();
-      playLocal('buzzer');
-    }
+    left--; disp.textContent = left;
+    if (left > 3) stageAudio.play('tick');
+    else if (left > 0) { disp.style.color = '#ef4444'; stageAudio.play('tick_urgent'); }
+    else { stopTimer(); playLocal('buzzer'); }
   }, 1000);
 }
-
-function stopTimer() {
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = null;
-}
-
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); timerInterval = null; }
 function handleRemoteCommand() {
   try {
     const sRaw = localStorage.getItem('tgs_sound_trigger');
     if (sRaw) {
       const cmd = JSON.parse(sRaw);
-      if (cmd.id !== lastSoundCmdId && (Date.now() - cmd.ts) < 5000) {
-        lastSoundCmdId = cmd.id;
-        playLocal(cmd.soundId, cmd.volume);
-      }
+      if (cmd.id !== lastSoundCmdId && (Date.now() - cmd.ts) < 5000) { lastSoundCmdId = cmd.id; playLocal(cmd.soundId, cmd.volume); }
     }
     const tRaw = localStorage.getItem('tgs_timer_trigger');
     if (tRaw) {
       const cmd = JSON.parse(tRaw);
-      if (cmd.id !== lastTimerCmdId && (Date.now() - cmd.ts) < 5000) {
-        lastTimerCmdId = cmd.id;
-        if (cmd.action === 'START') startTimer(cmd.seconds);
-        if (cmd.action === 'STOP') stopTimer();
-      }
+      if (cmd.id !== lastTimerCmdId && (Date.now() - cmd.ts) < 5000) { lastTimerCmdId = cmd.id; if (cmd.action === 'START') startTimer(cmd.seconds); if (cmd.action === 'STOP') stopTimer(); }
     }
   } catch (e) {}
 }
-
 TGSSync.onUpdate((type, payload) => {
-  if (type === 'play_sound' && payload && payload.id !== lastSoundCmdId) {
-    lastSoundCmdId = payload.id;
-    playLocal(payload.soundId, payload.volume);
-  } else if (type === 'timer_cmd' && payload && payload.id !== lastTimerCmdId) {
-    lastTimerCmdId = payload.id;
-    if (payload.action === 'START') startTimer(payload.seconds);
-    if (payload.action === 'STOP') stopTimer();
-  } else {
-    handleRemoteCommand();
-  }
+  if (type === 'play_sound' && payload && payload.id !== lastSoundCmdId) { lastSoundCmdId = payload.id; playLocal(payload.soundId, payload.volume); }
+  else if (type === 'timer_cmd' && payload && payload.id !== lastTimerCmdId) { lastTimerCmdId = payload.id; if (payload.action === 'START') startTimer(payload.seconds); if (payload.action === 'STOP') stopTimer(); }
+  else handleRemoteCommand();
 });
 </script>
 </body>
