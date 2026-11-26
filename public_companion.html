@@ -19,13 +19,7 @@
   .day-tab.active { background:#4c1d95; color:white; border-color:#7c3aed; }
   .event-badge { background:#f8fafc; padding:12px 14px; border-radius:14px; margin-bottom:9px; border:1px solid #e2e8f0; border-left:5px solid #8b5cf6; transition:all 0.25s ease; }
   .event-badge.is-reg { border-left-color:#10b981; background:#f0fdf4; }
-  .event-badge.user-registered {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border: 2px solid #f59e0b;
-    border-left: 7px solid #d97706;
-    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.28);
-    transform: scale(1.015);
-  }
+  .event-badge.user-registered { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; border-left: 7px solid #d97706; box-shadow: 0 6px 18px rgba(245, 158, 11, 0.28); transform: scale(1.015); }
   .event-time { font-size:0.82em; color:#64748b; font-weight:800; }
   .event-badge.user-registered .event-time { color:#92400e; font-size:0.9em; }
   .event-title { font-weight:900; font-size:1.02em; margin-top:2px; color:#0f172a; }
@@ -35,26 +29,9 @@
   label { font-weight:800; font-size:0.88em; display:block; margin-bottom:5px; color:#1e293b; }
   input, select, button.submit-btn { width:100%; padding:14px; border-radius:13px; border:2px solid #e2e8f0; margin-bottom:11px; font-size:16px; }
   button.submit-btn { background:linear-gradient(135deg,#8b5cf6,#2563eb); color:white; font-weight:900; border:none; cursor:pointer; }
-
-  /* Persistent Confirmation Pass */
-  .confirm-pass {
-    display:none;
-    background: linear-gradient(135deg, #065f46, #047857);
-    color: white;
-    border: 2px solid #34d399;
-    border-radius: 16px;
-    padding: 15px;
-    margin-bottom: 14px;
-    box-shadow: 0 8px 22px rgba(6, 95, 70, 0.35);
-  }
+  .confirm-pass { display:none; background: linear-gradient(135deg, #065f46, #047857); color: white; border: 2px solid #34d399; border-radius: 16px; padding: 15px; margin-bottom: 14px; box-shadow: 0 8px 22px rgba(6, 95, 70, 0.35); }
   .confirm-pass h3 { font-size: 1.05em; font-weight: 900; margin-bottom: 6px; color: #a7f3d0; }
-  .confirm-pass .pass-item {
-    background: rgba(255,255,255,0.12);
-    border-radius: 10px;
-    padding: 8px 11px;
-    margin-top: 6px;
-    font-size: 0.88em;
-  }
+  .confirm-pass .pass-item { background: rgba(255,255,255,0.12); border-radius: 10px; padding: 8px 11px; margin-top: 6px; font-size: 0.88em; }
 </style>
 </head>
 <body>
@@ -62,13 +39,11 @@
   <div class="card">
     <h1>🎮 ASSOMULTIPLAYER</h1>
     <div class="subtitle">Toulouse GameShow • 28 & 29 Nov. 2026</div>
-
     <div id="confirmPassBox" class="confirm-pass">
       <h3>✅ Inscription Confirmée !</h3>
       <div style="font-size:0.83em; color:#ecfdf5;">Présentez-vous devant la scène 5 minutes avant l'heure indiquée ci-dessous :</div>
       <div id="confirmPassList"></div>
     </div>
-
     <form id="regForm" onsubmit="registerAttendee(event)">
       <label for="eventSelect">🎯 Choisissez un Quizz ou Tournoi :</label>
       <select id="eventSelect" required></select>
@@ -77,12 +52,10 @@
       <button type="submit" id="submitBtn" class="submit-btn">🚀 Valider mon inscription</button>
     </form>
   </div>
-
   <div class="card">
     <h2 style="font-size:1.15em; font-weight:900; color:#4c1d95; margin-bottom:10px;">🔄 Activités en Continu sur le Stand</h2>
     <div id="ongoingPublicList" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
   </div>
-
   <div class="card">
     <h2 style="font-size:1.2em; font-weight:900; color:#4c1d95; margin-bottom:10px;">📅 Programme du Stand</h2>
     <div class="day-tabs">
@@ -92,159 +65,62 @@
     <div id="scheduleList"></div>
   </div>
 </div>
-
 <script>
 let currentDay = (new Date().getDate() === 29 && new Date().getMonth() === 10) ? 'Sunday' : 'Saturday';
 let activeEventsList = [];
-
-function getMyRegistrations() {
-  try { return JSON.parse(localStorage.getItem('tgs_my_phone_regs') || '[]'); }
-  catch (e) { return []; }
-}
-
+function getMyRegistrations() { try { return JSON.parse(localStorage.getItem('tgs_my_phone_regs') || '[]'); } catch (e) { return []; } }
 function isRegistrable(e) {
   if (typeof e.registrable === 'boolean') return e.registrable;
   const t = (e.event || '').toLowerCase();
   return t.includes('quizz') || t.includes('tournoi') || t.includes('shifumi') || t.includes('blindtest');
 }
-
 function renderConfirmationPass() {
-  const myRegs = getMyRegistrations();
-  const box = document.getElementById('confirmPassBox');
-  const list = document.getElementById('confirmPassList');
-  if (myRegs.length === 0) {
-    box.style.display = 'none';
-    return;
-  }
+  const myRegs = getMyRegistrations(), box = document.getElementById('confirmPassBox'), list = document.getElementById('confirmPassList');
+  if (myRegs.length === 0) { box.style.display = 'none'; return; }
   box.style.display = 'block';
-  list.innerHTML = myRegs.slice().reverse().map(r => `
-    <div class="pass-item">
-      <div style="font-weight:900;">👤 ${r.pseudo}</div>
-      <div>🎯 <strong>${r.eventTitle || r.event}</strong></div>
-      <div style="color:#fde68a; font-weight:800;">🕒 ${r.dayFr || ''} • ${r.timeRange || ''}</div>
-    </div>
-  `).join('');
+  list.innerHTML = myRegs.slice().reverse().map(r => `<div class="pass-item"><div style="font-weight:900;">👤 ${r.pseudo}</div><div>🎯 <strong>${r.eventTitle || r.event}</strong></div><div style="color:#fde68a; font-weight:800;">🕒 ${r.dayFr || ''} • ${r.timeRange || ''}</div></div>`).join('');
 }
-
 function renderAll() {
-  const ongoingList = TGSSync.getOngoingActivities();
-  const ongoingContainer = document.getElementById('ongoingPublicList');
-  if (ongoingContainer) {
-    ongoingContainer.innerHTML = ongoingList.map(act => `
-      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">
-        <div style="font-size:1.3em;">${act.icon || '🎮'}</div>
-        <div style="font-weight:900; font-size:0.88em; color:#0f172a; margin-top:2px;">${act.name}</div>
-        <div style="font-size:0.75em; color:#64748b;">${act.desc || ''}</div>
-      </div>
-    `).join('');
-  }
+  const ongoingList = TGSSync.getOngoingActivities(), ongoingContainer = document.getElementById('ongoingPublicList');
+  if (ongoingContainer) ongoingContainer.innerHTML = ongoingList.map(act => `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;"><div style="font-size:1.3em;">${act.icon || '🎮'}</div><div style="font-weight:900; font-size:0.88em; color:#0f172a; margin-top:2px;">${act.name}</div><div style="font-size:0.75em; color:#64748b;">${act.desc || ''}</div></div>`).join('');
   activeEventsList = TGSSync.getEvents();
-  const select = document.getElementById('eventSelect');
-  const prevVal = select.value;
-  select.innerHTML = '';
+  const select = document.getElementById('eventSelect'), prevVal = select.value; select.innerHTML = '';
   activeEventsList.filter(isRegistrable).forEach(e => {
-    const opt = document.createElement('option');
-    opt.value = `${e.day} - ${e.startTime} - ${e.event}`;
-    opt.dataset.day = e.day;
-    opt.dataset.start = e.startTime;
-    opt.dataset.end = e.endTime;
-    opt.dataset.title = e.event;
-    opt.textContent = `[${e.day === 'Saturday' ? 'Samedi' : 'Dimanche'} ${e.startTime} - ${e.endTime}] ${e.event}`;
-    select.appendChild(opt);
+    const opt = document.createElement('option'); opt.value = `${e.day} - ${e.startTime} - ${e.event}`;
+    opt.dataset.day = e.day; opt.dataset.start = e.startTime; opt.dataset.end = e.endTime; opt.dataset.title = e.event;
+    opt.textContent = `[${e.day === 'Saturday' ? 'Samedi' : 'Dimanche'} ${e.startTime} - ${e.endTime}] ${e.event}`; select.appendChild(opt);
   });
   if (prevVal) select.value = prevVal;
-  renderConfirmationPass();
-  switchDay(currentDay);
+  renderConfirmationPass(); switchDay(currentDay);
 }
-
 function switchDay(day) {
   currentDay = day;
   document.getElementById('tabSat').classList.toggle('active', day === 'Saturday');
   document.getElementById('tabSun').classList.toggle('active', day === 'Sunday');
-  const myRegs = getMyRegistrations();
-  const container = document.getElementById('scheduleList');
-
+  const myRegs = getMyRegistrations(), container = document.getElementById('scheduleList');
   container.innerHTML = activeEventsList.filter(e => e.day === day).map(e => {
-    const reg = isRegistrable(e);
-    const eventKey = `${e.day} - ${e.startTime} - ${e.event}`;
-    const matchedReg = myRegs.find(r => r.event === eventKey);
-    return `
-      <div id="sched-ev-${e.id}" class="event-badge ${reg ? 'is-reg' : ''} ${matchedReg ? 'user-registered' : ''}">
-        <div class="event-time">🕒 ${e.startTime} - ${e.endTime}</div>
-        <div class="event-title">${e.event}</div>
-        ${e.hosts ? `<div class="event-hosts">🎙️ ${e.hosts}</div>` : ''}
-        ${matchedReg
-          ? `<span class="registered-pill">✅ VOUS ÊTES INSCRIT (${matchedReg.pseudo}) • ${e.startTime}</span>`
-          : (reg ? `<span class="reg-pill">📝 Inscription ouverte ci-dessus</span>` : '')
-        }
-      </div>
-    `;
+    const reg = isRegistrable(e), eventKey = `${e.day} - ${e.startTime} - ${e.event}`, matchedReg = myRegs.find(r => r.event === eventKey);
+    return `<div id="sched-ev-${e.id}" class="event-badge ${reg ? 'is-reg' : ''} ${matchedReg ? 'user-registered' : ''}"><div class="event-time">🕒 ${e.startTime} - ${e.endTime}</div><div class="event-title">${e.event}</div>${e.hosts ? `<div class="event-hosts">🎙️ ${e.hosts}</div>` : ''}${matchedReg ? `<span class="registered-pill">✅ VOUS ÊTES INSCRIT (${matchedReg.pseudo}) • ${e.startTime}</span>` : (reg ? `<span class="reg-pill">📝 Inscription ouverte ci-dessus</span>` : '')}</div>`;
   }).join('');
 }
-
 async function registerAttendee(e) {
   e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Envoi en cours...';
-
-  const select = document.getElementById('eventSelect');
-  const opt = select.options[select.selectedIndex];
-  const dayVal = opt ? opt.dataset.day : 'Saturday';
-  const startVal = opt ? opt.dataset.start : '';
-  const endVal = opt ? opt.dataset.end : '';
-  const titleVal = opt ? opt.dataset.title : select.value;
-  const pseudoVal = document.getElementById('pseudo').value.trim();
-  const nowTime = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-
-  const reg = {
-    id: Date.now(),
-    action: 'register_quiz',
-    event: select.value,
-    pseudo: pseudoVal,
-    timestamp: nowTime
-  };
-
-  // Save globally for Hub + locally as user's personal pass
-  const list = JSON.parse(localStorage.getItem('tgsRegistrations') || '[]');
-  list.push(reg);
-  localStorage.setItem('tgsRegistrations', JSON.stringify(list));
-
+  const btn = document.getElementById('submitBtn'); btn.disabled = true; btn.textContent = '⏳ Envoi en cours...';
+  const select = document.getElementById('eventSelect'), opt = select.options[select.selectedIndex];
+  const dayVal = opt ? opt.dataset.day : 'Saturday', startVal = opt ? opt.dataset.start : '', endVal = opt ? opt.dataset.end : '', titleVal = opt ? opt.dataset.title : select.value;
+  const pseudoVal = document.getElementById('pseudo').value.trim(), nowTime = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const reg = { id: Date.now(), action: 'register_quiz', event: select.value, pseudo: pseudoVal, timestamp: nowTime };
+  const list = JSON.parse(localStorage.getItem('tgsRegistrations') || '[]'); list.push(reg); localStorage.setItem('tgsRegistrations', JSON.stringify(list));
   const myRegs = getMyRegistrations();
-  myRegs.push({
-    ...reg,
-    day: dayVal,
-    dayFr: dayVal === 'Saturday' ? 'Samedi 28 Nov.' : 'Dimanche 29 Nov.',
-    timeRange: `${startVal} - ${endVal}`,
-    eventTitle: titleVal
-  });
+  myRegs.push({ ...reg, day: dayVal, dayFr: dayVal === 'Saturday' ? 'Samedi 28 Nov.' : 'Dimanche 29 Nov.', timeRange: `${startVal} - ${endVal}`, eventTitle: titleVal });
   localStorage.setItem('tgs_my_phone_regs', JSON.stringify(myRegs));
-
-  TGSSync.broadcast('registration_added', reg);
-  await TGSSync.pushCloudState(reg);
-
-  document.getElementById('regForm').reset();
-  renderConfirmationPass();
-  switchDay(dayVal);
-
-  // Scroll smoothly to highlight the registered event on the schedule
+  TGSSync.broadcast('registration_added', reg); await TGSSync.pushCloudState(reg);
+  document.getElementById('regForm').reset(); renderConfirmationPass(); switchDay(dayVal);
   const targetEv = activeEventsList.find(ev => `${ev.day} - ${ev.startTime} - ${ev.event}` === reg.event);
-  if (targetEv) {
-    const cardEl = document.getElementById(`sched-ev-${targetEv.id}`);
-    if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  btn.disabled = false;
-  btn.textContent = '🚀 Valider mon inscription';
+  if (targetEv) { const cardEl = document.getElementById(`sched-ev-${targetEv.id}`); if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  btn.disabled = false; btn.textContent = '🚀 Valider mon inscription';
 }
-
-document.addEventListener('DOMContentLoaded', async () => {
-  renderAll();
-  if (!TGSSync.isOfflineMode()) {
-    await TGSSync.fetchCloudData('schedule');
-    renderAll();
-  }
-});
+document.addEventListener('DOMContentLoaded', async () => { renderAll(); if (!TGSSync.isOfflineMode()) { await TGSSync.fetchCloudData('schedule'); renderAll(); } });
 </script>
 </body>
 </html>

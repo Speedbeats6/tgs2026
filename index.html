@@ -3,9 +3,10 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>AssoMultiplayer Dashboard - TGS 2026</title>
+ <title>AssoMultiplayer Schedule & QR - TGS 2026</title>
  <script src="schedule.js"></script>
  <script src="shared_sync.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
  <style>
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -15,251 +16,148 @@
  .header-left { display: flex; align-items: center; width: 25%; }
  .header-left img { height: 65px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
  .header-center { text-align: center; width: 50%; }
- .header-center h1 { font-size: 2.5em; font-weight: 900; letter-spacing: 2px; margin-bottom: 2px; text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
- .header-center .subtitle { color: #d8b4fe; font-size: 1.1em; font-weight: 700; letter-spacing: 3px; }
+ .header-center h1 { font-size: 2.3em; font-weight: 900; letter-spacing: 2px; margin-bottom: 2px; text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
+ .header-center .subtitle { color: #d8b4fe; font-size: 1.05em; font-weight: 700; letter-spacing: 3px; }
  .header-right { width: 25%; display: flex; justify-content: flex-end; }
- .clock-display { font-size: 2em; font-weight: 900; background: rgba(255, 255, 255, 0.1); padding: 8px 25px; border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.2); }
- .dashboard-main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(0, 1fr); gap: 20px 25px; padding: 0 20px 20px 20px; }
- .announcement-container { grid-column: 1 / 3; grid-row: 1; display: none; background: linear-gradient(90deg, #ef4444, #f59e0b, #ef4444); background-size: 200% 200%; animation: gradientMove 3s ease infinite; color: white; padding: 15px 30px; border-radius: 15px; font-weight: 900; font-size: 1.6em; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); border: 2px solid #fca5a5; white-space: nowrap; overflow: hidden; position: relative; }
+ .clock-display { font-size: 1.9em; font-weight: 900; background: rgba(255, 255, 255, 0.1); padding: 8px 22px; border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.2); }
+ .dashboard-main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.25fr 0.75fr; grid-template-rows: auto minmax(0, 1fr); gap: 18px 22px; padding: 0 20px 20px 20px; }
+ .announcement-container { grid-column: 1 / 3; grid-row: 1; display: none; background: linear-gradient(90deg, #ef4444, #f59e0b, #ef4444); background-size: 200% 200%; animation: gradientMove 3s ease infinite; color: white; padding: 13px 28px; border-radius: 15px; font-weight: 900; font-size: 1.5em; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); border: 2px solid #fca5a5; white-space: nowrap; overflow: hidden; }
  @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
  .announcement-marquee { display: inline-block; animation: marquee 20s linear infinite; }
  @keyframes marquee { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
- .planning-column { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 15px; height: 100%; min-height: 0; }
- .ongoing-activities { padding: 15px; }
- .ongoing-title { font-size: 1.1em; font-weight: 900; color: #4c1d95; margin-bottom: 10px; text-align: center; }
- .ongoing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
- .ongoing-item { background: #f8fafc; padding: 8px; border-radius: 10px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; text-align: left; }
- .ongoing-icon { font-size: 1.5em; }
- .ongoing-text-wrapper { flex: 1; }
- .ongoing-name { font-weight: bold; font-size: 0.9em; color: #0f172a;}
- .ongoing-desc { font-size: 0.75em; color: #64748b; }
- .day-section { padding: 15px; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
- .day-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
- .day-tab { background: #f1f5f9; color: #64748b; border: 2px solid #e2e8f0; padding: 8px 25px; border-radius: 20px; font-weight: 900; font-size: 1.1em; cursor: pointer; transition: all 0.2s; }
- .day-tab.active { background: #4c1d95; color: white; border-color: #8b5cf6; box-shadow: 0 4px 10px rgba(76, 29, 149, 0.2); }
- .events-container { display: flex; flex-direction: column; flex: 1; justify-content: space-between; overflow-y: auto; }
- .event-item { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 15px; border-left: 6px solid #cbd5e1; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
- .event-item:hover { transform: translateX(5px); box-shadow: 0 4px 8px rgba(139, 92, 246, 0.15); border-left-color: #8b5cf6; }
- .event-item.current { background: #ecfdf5; border-left: 6px solid #10b981; border-color: #a7f3d0; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15); transform: scale(1.02); }
- .event-item.next { background: #fffbeb; border-left: 6px solid #f59e0b; border-color: #fde68a; }
- .event-left { display: flex; align-items: center; gap: 15px; }
+ .planning-column { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 14px; height: 100%; min-height: 0; }
+ .ongoing-activities { padding: 14px; }
+ .ongoing-title { font-size: 1.05em; font-weight: 900; color: #4c1d95; margin-bottom: 10px; text-align: center; }
+ .ongoing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+ .ongoing-item { background: #f8fafc; padding: 8px; border-radius: 10px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; }
+ .ongoing-icon { font-size: 1.4em; }
+ .ongoing-name { font-weight: 800; font-size: 0.88em; color: #0f172a; }
+ .ongoing-desc { font-size: 0.74em; color: #64748b; }
+ .day-section { padding: 14px; flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+ .day-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 12px; }
+ .day-tab { background: #f1f5f9; color: #64748b; border: 2px solid #e2e8f0; padding: 8px 24px; border-radius: 20px; font-weight: 900; font-size: 1.05em; cursor: pointer; }
+ .day-tab.active { background: #4c1d95; color: white; border-color: #8b5cf6; }
+ .events-container { display: flex; flex-direction: column; gap: 6px; flex: 1; overflow-y: auto; }
+ .event-item { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 9px 14px; border-left: 6px solid #cbd5e1; display: flex; align-items: center; justify-content: space-between; }
+ .event-item.current { background: #ecfdf5; border-left-color: #10b981; border-color: #a7f3d0; }
+ .event-item.next { background: #fffbeb; border-left-color: #f59e0b; border-color: #fde68a; }
+ .event-left { display: flex; align-items: center; gap: 14px; }
  .event-time-block { display: flex; flex-direction: column; min-width: 85px; }
- .event-time { font-size: 1.1em; font-weight: 900; color: #64748b; }
- .time-badge { font-size: 0.7em; color: #94a3b8; font-weight: bold; }
- .event-title { font-size: 1.2em; font-weight: 900; color: #0f172a; }
- .event-item.current .event-time { color: #059669; }
- .event-item.next .event-time { color: #d97706; }
- .event-hosts { color: #64748b; font-size: 0.9em; font-style: italic; text-align: right; }
- .media-column { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; height: 100%; gap: 15px; min-height: 0; }
- .media-showcase { flex: 1; min-height: 0; position: relative; border-radius: 20px; overflow: hidden; background: #000000; border: 4px solid #8b5cf6; }
- .media-video, .media-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: none; }
+ .event-time { font-size: 1.05em; font-weight: 900; color: #475569; }
+ .time-badge { font-size: 0.7em; color: #94a3b8; font-weight: 700; }
+ .event-title { font-size: 1.12em; font-weight: 900; color: #0f172a; }
+ .event-hosts { color: #6d28d9; font-size: 0.88em; font-weight: 700; text-align: right; }
+ .side-column { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; gap: 14px; height: 100%; min-height: 0; }
+ .qr-schedule-panel { padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; flex: 1; background: linear-gradient(160deg, #ffffff 0%, #f5f3ff 100%); }
+ .qr-badge { background: #ede9fe; color: #5b21b6; font-weight: 900; font-size: 0.85em; padding: 5px 14px; border-radius: 999px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.8px; }
+ .qr-title { font-size: 1.55em; font-weight: 900; color: #3b0764; margin-bottom: 6px; }
+ .qr-desc { font-size: 0.95em; color: #475569; font-weight: 600; margin-bottom: 16px; max-width: 340px; }
+ .qr-frame { background: #ffffff; border: 4px solid #7c3aed; border-radius: 22px; padding: 14px; box-shadow: 0 12px 28px rgba(124, 58, 237, 0.18); display: inline-flex; align-items: center; justify-content: center; }
+ .qr-url-note { margin-top: 12px; font-size: 0.78em; color: #64748b; font-weight: 700; word-break: break-all; max-width: 340px; }
  </style>
 </head>
 <body>
  <header class="top-header panel">
- <div class="header-left"><img id="headerLogoImg" src="assets/NewLogoMP_Seri1coul_Noir.png" alt="AssoMultiplayer Logo" onerror="handleHeaderLogoError(this)"></div>
- <div class="header-center"><h1>🎮 ASSOMULTIPLAYER 🎮</h1><div class="subtitle">TOULOUSE GAMESHOW - 28 & 29 NOV. 2026</div></div>
- <div class="header-right"><div class="clock-display" id="currentTime"></div></div>
+  <div class="header-left"><img id="headerLogoImg" src="assets/NewLogoMP_Seri1coul_Noir.png" alt="AssoMultiplayer Logo" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='NewLogoMP_Seri1coul_Noir.png';}else{this.style.display='none';}"></div>
+  <div class="header-center"><h1>🎮 ASSOMULTIPLAYER 🎮</h1><div class="subtitle">PROGRAMME STAND • TGS 28 & 29 NOV. 2026</div></div>
+  <div class="header-right"><div class="clock-display" id="currentTime"></div></div>
  </header>
  <main class="dashboard-main">
- <div id="announcementBox" class="announcement-container"><div class="announcement-marquee" id="announcementText"></div></div>
- <div class="planning-column">
- <div class="ongoing-activities panel"><div class="ongoing-title">🔄 ACTIVITÉS EN CONTINU</div><div class="ongoing-grid" id="ongoing-grid-container"></div></div>
- <div class="day-section panel">
- <div class="day-tabs">
- <button class="day-tab" id="btn-saturday" onclick="setDisplayDay('Saturday')">SAMEDI 28</button>
- <button class="day-tab" id="btn-sunday" onclick="setDisplayDay('Sunday')">DIMANCHE 29</button>
- </div>
- <div class="events-container" id="daily-events-container"></div>
- </div>
- </div>
- <div class="media-column"><div class="media-showcase"><video id="randomVideo" class="media-video" autoplay muted playsinline></video><img id="randomImage" class="media-photo" src="" alt="TGS Gallery"></div></div>
+  <div id="announcementBox" class="announcement-container"><div class="announcement-marquee" id="announcementText"></div></div>
+  <div class="planning-column">
+   <div class="ongoing-activities panel"><div class="ongoing-title">🔄 ACTIVITÉS EN CONTINU</div><div class="ongoing-grid" id="ongoing-grid-container"></div></div>
+   <div class="day-section panel">
+    <div class="day-tabs">
+     <button class="day-tab" id="btn-saturday" onclick="setDisplayDay('Saturday')">SAMEDI 28</button>
+     <button class="day-tab" id="btn-sunday" onclick="setDisplayDay('Sunday')">DIMANCHE 29</button>
+    </div>
+    <div class="events-container" id="daily-events-container"></div>
+   </div>
+  </div>
+  <div class="side-column">
+   <div class="qr-schedule-panel panel">
+    <div class="qr-badge">📱 Inscriptions Quizz & Tournois</div>
+    <div class="qr-title">Scannez pour vous inscrire !</div>
+    <div class="qr-desc">Réservez votre place sur les quizz et tournois du stand AssoMultiplayer depuis votre téléphone.</div>
+    <div class="qr-frame" id="scheduleQrBox"></div>
+    <div class="qr-url-note" id="scheduleQrUrl"></div>
+   </div>
+  </div>
  </main>
  <script>
- 
- function handleHeaderLogoError(img) {
-   const tried = img.dataset.tried || '';
-   if (!tried.includes('assets1')) {
-     img.dataset.tried = tried + ' assets1';
-     img.src = 'NewLogoMP_Seri1coul_Noir.png';
-   } else if (!tried.includes('assets2')) {
-     img.dataset.tried = tried + ' assets2';
-     img.src = 'assets/NewLogoMP_Seri1coul_Blanc.png';
-   } else if (!tried.includes('rootblanc')) {
-     img.dataset.tried = tried + ' rootblanc';
-     img.src = 'NewLogoMP_Seri1coul_Blanc.png';
-   } else {
-     img.style.display = 'none';
-   }
- }
-
- let currentEventId = null;
- let nextEventId = null;
- let activeDisplayDay = 'Saturday';
-
- function updateTime() {
-   const now = new Date();
-   document.getElementById('currentTime').textContent = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
- }
-
+ let currentEventId = null, nextEventId = null, activeDisplayDay = 'Saturday';
+ function updateTime() { document.getElementById('currentTime').textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
  function checkBroadcastAnnouncement() {
-   const msg = localStorage.getItem('tgs_broadcast_announcement');
-   const banner = document.getElementById('announcementBox');
-   const marquee = document.getElementById('announcementText');
-   if (msg && msg.trim() !== "") {
-     marquee.textContent = "⚠️ " + msg + " ⚠️";
-     banner.style.display = "block";
-   } else {
-     banner.style.display = "none";
-   }
+   const st = TGSSync.getOverlayState();
+   const msg = (st && typeof st.announcement === 'string') ? st.announcement : (localStorage.getItem('tgs_broadcast_announcement') || '');
+   const banner = document.getElementById('announcementBox'), marquee = document.getElementById('announcementText');
+   if (msg && msg.trim() !== '') { marquee.textContent = '⚠️ ' + msg.trim() + ' ⚠️'; banner.style.display = 'block'; }
+   else banner.style.display = 'none';
  }
-
- function calculateDuration(start, end) {
-   const [sh, sm] = start.split(':').map(Number);
-   const [eh, em] = end.split(':').map(Number);
-   return `${(eh * 60 + em) - (sh * 60 + sm)}min`;
- }
-
+ function calculateDuration(start, end) { return `${TGSSync.parseTimeToMinutes(end) - TGSSync.parseTimeToMinutes(start)}min`; }
  function renderOngoingActivities() {
-   if (typeof ongoingActivities === 'undefined') return;
-   document.getElementById('ongoing-grid-container').innerHTML = ongoingActivities.map(act => `
-     <div class="ongoing-item"><div class="ongoing-icon">${act.icon}</div><div class="ongoing-text-wrapper"><div class="ongoing-name">${act.name}</div><div class="ongoing-desc">${act.desc}</div></div></div>
+   document.getElementById('ongoing-grid-container').innerHTML = TGSSync.getOngoingActivities().map(act => `
+     <div class="ongoing-item"><div class="ongoing-icon">${act.icon || '🎮'}</div><div><div class="ongoing-name">${act.name}</div><div class="ongoing-desc">${act.desc || ''}</div></div></div>
    `).join('');
  }
-
  function setDisplayDay(day) {
    activeDisplayDay = day;
    document.getElementById('btn-saturday').classList.toggle('active', day === 'Saturday');
    document.getElementById('btn-sunday').classList.toggle('active', day === 'Sunday');
    const container = document.getElementById('daily-events-container');
-   const dayEvents = TGSSync.getEvents().filter(e => e.day === day);
-   container.innerHTML = dayEvents.map(e => `
-     <div class="event-item" data-id="${e.id}" onclick="selectEvent(${e.id})">
+   container.innerHTML = TGSSync.getEvents().filter(e => e.day === day).map(e => `
+     <div class="event-item" data-id="${e.id}">
        <div class="event-left">
          <div class="event-time-block"><span class="event-time">${e.startTime} - ${e.endTime}</span><span class="time-badge">${calculateDuration(e.startTime, e.endTime)}</span></div>
          <div class="event-title">${e.event}</div>
        </div>
-       ${e.hosts ? `<div class="event-hosts">👥 ${e.hosts}</div>` : ''}
+       ${e.hosts ? `<div class="event-hosts">🎙️ ${e.hosts}</div>` : ''}
      </div>
    `).join('');
-   if (currentEventId) selectEvent(currentEventId);
- }
-
- function selectEvent(eventId) {
-   document.querySelectorAll('.event-item').forEach(item => item.classList.remove('current', 'next'));
-   currentEventId = eventId;
-   const allEvents = TGSSync.getEvents();
-   const currentEvent = allEvents.find(e => e.id === eventId);
-   if (!currentEvent) return;
-   if (currentEvent.day !== activeDisplayDay) setDisplayDay(currentEvent.day);
-   const idx = allEvents.findIndex(e => e.id === eventId);
-   nextEventId = (idx < allEvents.length - 1 && allEvents[idx + 1].day === currentEvent.day) ? allEvents[idx + 1].id : null;
-   const curEl = document.querySelector(`[data-id="${currentEventId}"]`);
-   if (curEl) curEl.classList.add('current');
-   if (nextEventId) {
-     const nxtEl = document.querySelector(`[data-id="${nextEventId}"]`);
-     if (nxtEl) nxtEl.classList.add('next');
-   }
- }
-
- function syncActiveEventFromOverlay() {
-   const st = TGSSync.getOverlayState();
-   const allEvents = TGSSync.getEvents();
-
-   document.querySelectorAll('.event-item').forEach(item => item.classList.remove('current', 'next'));
-   currentEventId = null;
-   nextEventId = null;
-
-   if (st.mode === 'HIDDEN') {
-     return;
-   }
-
-   if (st.mode === 'MANUAL' && st.manualEventId) {
-     const target = allEvents.find(e => Number(e.id) === Number(st.manualEventId));
-     if (target) {
-       selectEvent(target.id);
-       return;
-     }
-   }
-
-   // AUTO mode: match current clock time on Saturday or Sunday
-   const now = new Date();
-   const curMin = now.getHours() * 60 + now.getMinutes();
-   const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
-   const today = dayName.charAt(0).toUpperCase() + dayName.slice(1).toLowerCase();
-   const targetDay = (today === 'Saturday' || today === 'Sunday') ? today : activeDisplayDay;
-
-   if (targetDay !== activeDisplayDay) {
-     setDisplayDay(targetDay);
-   }
-
-   const dayEvents = allEvents.filter(e => e.day === targetDay);
-   const activeIdx = dayEvents.findIndex(e => {
-     const s = TGSSync.parseTimeToMinutes(e.startTime);
-     const en = TGSSync.parseTimeToMinutes(e.endTime);
-     return curMin >= s && curMin < en;
-   });
-
-   if (activeIdx !== -1) {
-     selectEvent(dayEvents[activeIdx].id);
-   }
- }
-
- TGSSync.onUpdate(() => {
-   checkBroadcastAnnouncement();
-   setDisplayDay(activeDisplayDay);
    syncActiveEventFromOverlay();
- });
-
- renderOngoingActivities();
- setDisplayDay('Saturday');
- updateTime();
- checkBroadcastAnnouncement();
- syncActiveEventFromOverlay();
- setInterval(updateTime, 1000);
- setInterval(syncActiveEventFromOverlay, 15000);
-
- const videoSourceList = Array.from({length: 17}, (_, i) => `videos/video${i + 1}.mp4`);
- const photoSourceList = Array.from({length: 150}, (_, i) => `photos/photo (${i + 1}).jpg`);
- photoSourceList.push('assets/AssoMultiplayer Group Pic 2022.jpg', 'assets/AssoMultiplayer Group Pic 2023.jpg', 'assets/CandiCrochettes Promo.jpg');
-
- class ShuffleBag {
-   constructor(items) { this.originalItems = items; this.bag = []; }
-   getNext() {
-     if (this.bag.length === 0) {
-       this.bag = [...this.originalItems];
-       for (let i = this.bag.length - 1; i > 0; i--) {
-         const j = Math.floor(Math.random() * (i + 1));
-         [this.bag[i], this.bag[j]] = [this.bag[j], this.bag[i]];
-       }
+ }
+ function syncActiveEventFromOverlay() {
+   const st = TGSSync.getOverlayState(), allEvents = TGSSync.getEvents();
+   document.querySelectorAll('.event-item').forEach(item => item.classList.remove('current', 'next'));
+   currentEventId = null; nextEventId = null;
+   if (st.mode === 'HIDDEN') return;
+   let activeEvent = null;
+   if (st.mode === 'MANUAL' && st.manualEventId) activeEvent = allEvents.find(e => Number(e.id) === Number(st.manualEventId)) || null;
+   else {
+     const now = new Date(), curMin = now.getHours() * 60 + now.getMinutes();
+     const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+     const today = dayName.charAt(0).toUpperCase() + dayName.slice(1).toLowerCase();
+     const targetDay = (today === 'Saturday' || today === 'Sunday') ? today : activeDisplayDay;
+     if (targetDay !== activeDisplayDay) { setDisplayDay(targetDay); return; }
+     const dayEvents = allEvents.filter(e => e.day === targetDay);
+     const activeIdx = dayEvents.findIndex(e => curMin >= TGSSync.parseTimeToMinutes(e.startTime) && curMin < TGSSync.parseTimeToMinutes(e.endTime));
+     if (activeIdx !== -1) activeEvent = dayEvents[activeIdx];
+   }
+   if (activeEvent) {
+     if (activeEvent.day !== activeDisplayDay) { currentEventId = activeEvent.id; setDisplayDay(activeEvent.day); return; }
+     currentEventId = activeEvent.id;
+     const idx = allEvents.findIndex(e => e.id === activeEvent.id);
+     nextEventId = (idx < allEvents.length - 1 && allEvents[idx + 1].day === activeEvent.day) ? allEvents[idx + 1].id : null;
+     const curEl = document.querySelector(`[data-id="${currentEventId}"]`);
+     if (curEl) curEl.classList.add('current');
+     if (nextEventId) { const nxtEl = document.querySelector(`[data-id="${nextEventId}"]`); if (nxtEl) nxtEl.classList.add('next'); }
+   }
+ }
+ function renderScheduleQR() {
+   const base = TGSSync.getPublicBaseUrl() || DEFAULT_PUBLIC_BASE_URL;
+   const targetUrl = `${base}/public_companion.html`;
+   document.getElementById('scheduleQrUrl').textContent = targetUrl;
+   const box = document.getElementById('scheduleQrBox');
+   try {
+     if (typeof qrcode !== 'undefined') {
+       const qr = qrcode(0, 'M'); qr.addData(targetUrl); qr.make(); box.innerHTML = qr.createImgTag(6); return;
      }
-     return this.bag.pop();
-   }
+   } catch (e) {}
+   box.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(targetUrl)}" width="220" height="220" alt="QR Code">`;
  }
- const videoBag = new ShuffleBag(videoSourceList);
- const photoBag = new ShuffleBag(photoSourceList);
- const videoPlayer = document.getElementById('randomVideo');
- const imageViewer = document.getElementById('randomImage');
- let isVideoTurn = true;
- function playNextMedia() {
-   if (isVideoTurn) {
-     imageViewer.style.display = 'none';
-     videoPlayer.style.display = 'block';
-     videoPlayer.src = videoBag.getNext();
-     videoPlayer.play().catch(() => {});
-     isVideoTurn = false;
-   } else {
-     videoPlayer.style.display = 'none';
-     imageViewer.style.display = 'block';
-     imageViewer.src = photoBag.getNext();
-     isVideoTurn = true;
-     setTimeout(playNextMedia, 10000);
-   }
- }
- videoPlayer.addEventListener('ended', playNextMedia);
- videoPlayer.addEventListener('error', playNextMedia);
- imageViewer.addEventListener('error', () => { isVideoTurn = true; playNextMedia(); });
- playNextMedia();
+ TGSSync.onUpdate(() => { checkBroadcastAnnouncement(); renderOngoingActivities(); setDisplayDay(activeDisplayDay); renderScheduleQR(); });
+ renderOngoingActivities(); setDisplayDay('Saturday'); renderScheduleQR(); updateTime(); checkBroadcastAnnouncement();
+ setInterval(updateTime, 1000); setInterval(checkBroadcastAnnouncement, 1500); setInterval(syncActiveEventFromOverlay, 5000);
  </script>
 </body>
 </html>

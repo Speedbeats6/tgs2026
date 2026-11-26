@@ -1,11 +1,12 @@
 const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycby6GdH-SOFNLFZPr09gXnguqajQazjOoJnOwParsjnlk0kwEuVm2gzS0q-uXgvHbhfE9g/exec';
+const DEFAULT_PUBLIC_BASE_URL = 'https://speedbeats6.github.io/tgs2026';
 const ASSO_FALLBACK_LOGO = 'assets/NewLogoMP_Seri1coul_Noir.png';
 
 const TGSSync = {
   channel: ('BroadcastChannel' in window) ? new BroadcastChannel('assomultiplayer_tgs_2026') : null,
 
   isOfflineMode() {
-    return localStorage.getItem('tgs_force_offline') === '1' || !navigator.onLine;
+    return localStorage.getItem('tgs_force_offline') === '1';
   },
 
   setOfflineMode(forceOff) {
@@ -17,7 +18,6 @@ const TGSSync = {
   formatTimeLabel(raw) {
     if (!raw) return '';
     const str = String(raw).trim();
-    // Fix Google Sheets 1899 epoch Date string e.g. "Sat Dec 30 1899 19:02:00 GMT+0000"
     const match1899 = str.match(/1899\s+(\d{1,2}:\d{2})/);
     if (match1899) return match1899[1];
     const isoMatch = str.match(/T(\d{2}:\d{2})/);
@@ -57,10 +57,10 @@ const TGSSync = {
   getPublicBaseUrl() {
     const saved = localStorage.getItem('tgs_public_base_url');
     if (saved && saved.trim()) return saved.trim().replace(/\/$/, '');
-    if (window.location.protocol.startsWith('http')) {
+    if (window.location.protocol.startsWith('https') && window.location.hostname.includes('github.io')) {
       return window.location.href.substring(0, window.location.href.lastIndexOf('/'));
     }
-    return '';
+    return DEFAULT_PUBLIC_BASE_URL;
   },
 
   setPublicBaseUrl(url) {
@@ -69,12 +69,16 @@ const TGSSync = {
   },
 
   broadcast(type, payload = {}) {
-    if (this.channel) this.channel.postMessage({ type, payload, ts: Date.now() });
-    localStorage.setItem('tgs_last_ping', JSON.stringify({ type, ts: Date.now() }));
+    if (this.channel) {
+      try { this.channel.postMessage({ type, payload, ts: Date.now() }); } catch (e) {}
+    }
+    try { localStorage.setItem('tgs_last_ping', JSON.stringify({ type, ts: Date.now() })); } catch (e) {}
   },
 
   onUpdate(callback) {
-    if (this.channel) this.channel.onmessage = (e) => callback(e.data.type, e.data.payload);
+    if (this.channel) {
+      this.channel.onmessage = (e) => callback(e.data.type, e.data.payload);
+    }
     window.addEventListener('storage', (e) => {
       if (e.key && e.key.startsWith('tgs_')) callback(e.key, null);
     });
@@ -126,8 +130,7 @@ const TGSSync = {
       manualEventId: null,
       showTicker: true,
       announcement: typeof defaultAnnouncement !== 'undefined' ? defaultAnnouncement : '',
-      showQR: false,
-      showPhotoStats: true
+      showQR: true
     };
     try {
       const saved = JSON.parse(localStorage.getItem('tgs_overlay_state') || '{}');
@@ -170,11 +173,6 @@ const TGSSync = {
     catch (e) { return []; }
   },
 
-  getStatsCache() {
-    try { return JSON.parse(localStorage.getItem('tgs_photo_stats_cache') || 'null'); }
-    catch (e) { return null; }
-  },
-
   async pushCloudState(payload) {
     if (this.isOfflineMode()) return false;
     const url = this.getScriptUrl();
@@ -199,14 +197,11 @@ const TGSSync = {
     try {
       const res = await fetch(`${url}?action=${encodeURIComponent(type)}&_t=${Date.now()}`, {
         method: 'GET',
-	cache: 'no-store',
+        cache: 'no-store',
         redirect: 'follow'
       });
       if (!res.ok) return null;
       const data = await res.json();
-      if (data && data.photoStats) {
-        localStorage.setItem('tgs_photo_stats_cache', JSON.stringify(data.photoStats));
-      }
       if (data && Array.isArray(data.registrations)) {
         const deletedIds = new Set(JSON.parse(localStorage.getItem('tgs_deleted_reg_ids') || '[]').map(String));
         const localRegs = JSON.parse(localStorage.getItem('tgsRegistrations') || '[]');
@@ -226,12 +221,6 @@ const TGSSync = {
       }
       if (data && Array.isArray(data.ongoing) && data.ongoing.length > 0 && !localStorage.getItem('tgs_custom_ongoing_dirty')) {
         localStorage.setItem('tgs_custom_ongoing', JSON.stringify(data.ongoing));
-      }
-if (data && data.overlay && typeof data.overlay === 'object') {
-        const current = this.getOverlayState();
-        const mergedOverlay = { ...current, ...data.overlay };
-        localStorage.setItem('tgs_overlay_state', JSON.stringify(mergedOverlay));
-        localStorage.setItem('tgs_broadcast_announcement', mergedOverlay.announcement || '');
       }
       return data;
     } catch (e) {

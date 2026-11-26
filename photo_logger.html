@@ -14,344 +14,161 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubunt
 .header h1{font-size:1.5rem;color:white;margin-bottom:0.25rem;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
 .header p{color:#e2e8f0;font-size:0.9rem;font-weight:500}
 .card{background:rgba(255,255,255,0.97);border-radius:20px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 10px 40px rgba(0,0,0,0.15)}
-
 .config-card {background: #f8fafc; border-left: 4px solid #3b82f6;}
 .config-header {display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 0.5rem;}
 .config-header h3 {font-size: 1.1rem; color: #1e293b; margin: 0;}
 .config-content {display: flex; flex-direction: column; gap: 1rem; overflow: hidden; transition: max-height 0.3s ease-out;}
 .collapsed {max-height: 0; padding: 0; margin: 0; border: none;}
 .expanded {max-height: 500px;}
-
 .radio-group{display:flex;gap:1.5rem;margin-bottom:1rem;justify-content:center; background: #f1f5f9; padding: 0.5rem; border-radius: 12px;}
 .radio-item{display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:600}
 .form-row{display:grid;grid-template-columns:1fr;gap:0.75rem;margin-bottom:0.75rem}
 .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem}
-input[type="text"],input[type="email"],input[type="number"],textarea,select{width:100%;padding:0.875rem 1rem;border:2px solid #e5e7eb;border-radius:12px;font-size:16px;background:white; transition: border-color 0.2s;}
-input:focus, textarea:focus {outline: none; border-color: #3b82f6;}
-
-.btn{padding:0.875rem 1.5rem;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;touch-action:manipulation;-webkit-tap-highlight-color:transparent;width:100%;}
+input[type="text"],input[type="email"],input[type="number"],textarea,select{width:100%;padding:0.875rem 1rem;border:2px solid #e5e7eb;border-radius:12px;font-size:16px;background:white;}
+.btn{padding:0.875rem 1.5rem;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;}
 .btn-primary{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:white;padding:1rem;font-size:1.1rem;border-radius:16px}
 .btn-warning{background: #f59e0b; color: white; margin-top: 0.5rem;}
 .btn-danger{background: #ef4444; color: white; margin-top: 1.5rem;}
 .btn-secondary{background: #64748b; color: white; margin-top: 0.5rem; font-size: 0.9rem;}
-
 .gdpr-notice {font-size: 0.75rem; color: #6b7280; margin-top: 1.5rem; text-align: justify; line-height: 1.4; border-top: 1px solid #e5e7eb; padding-top: 1rem;}
-
 .offline-container {display: none; background: #fef3c7; border: 2px dashed #f59e0b; border-radius: 12px; padding: 1rem; margin-top: 1rem;}
 .offline-container h4 {color: #b45309; margin-bottom: 0.5rem;}
 .offline-list {list-style: none; font-size: 0.85rem; max-height: 150px; overflow-y: auto; margin-bottom: 0.5rem;}
 .offline-list li {background: rgba(255,255,255,0.7); padding: 0.5rem; border-radius: 6px; margin-bottom: 0.25rem; border-left: 3px solid #f59e0b;}
-
 #successOverlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(16, 185, 129, 0.95); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;}
 #successOverlay.show {opacity: 1; pointer-events: auto;}
 .check-icon {font-size: 5rem; margin-bottom: 1rem;}
-
-@media(max-width:768px){
-  body{padding:0.5rem}
-  .card{padding:1rem}
-  .form-row-2{grid-template-columns:1fr;} 
-}
+@media(max-width:768px){ body{padding:0.5rem} .card{padding:1rem} .form-row-2{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
-
-<div id="successOverlay">
-  <div class="check-icon">✅</div>
-  <h2>Enregistré !</h2>
-  <p>Prêt pour le prochain.</p>
-</div>
-
+<div id="successOverlay"><div class="check-icon">✅</div><h2>Enregistré !</h2><p>Prêt pour le prochain.</p></div>
 <div class="container">
   <div class="header">
-    <img src="assets/NewLogoMP_Seri1coul_Noir.png" alt="AssoMultiplayer Logo" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='NewLogoMP_Seri1coul_Noir.png';}else{this.style.display='none';}"> 
-    <h1>Stand Cosplay</h1>
-    <p>Logging Photo & Vidéo</p>
+    <img src="assets/NewLogoMP_Seri1coul_Noir.png" alt="AssoMultiplayer Logo" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='NewLogoMP_Seri1coul_Noir.png';}else{this.style.display='none';}">
+    <h1>Stand Cosplay</h1><p>Logging Photo & Vidéo</p>
   </div>
-
   <div class="card config-card">
-    <div class="config-header" onclick="toggleConfig()">
-      <h3>⚙️ Config Photographe</h3>
-      <span id="configToggleIcon">▼</span>
-    </div>
+    <div class="config-header" onclick="toggleConfig()"><h3>⚙️ Config Photographe</h3><span id="configToggleIcon">▼</span></div>
     <div class="config-content expanded" id="configContent">
       <div class="form-row-2">
         <input type="text" id="photographerName" placeholder="👤 Votre pseudo / nom" onchange="autoCollapseConfig()">
         <input type="text" id="cameraUsed" placeholder="📷 Appareil (ex: Sony A7)" onchange="autoCollapseConfig()">
       </div>
-      <div class="form-row" style="margin-bottom:0;">
-        <button class="btn btn-danger" onclick="resetApp()">🗑️ Remise à zéro (Nettoyer les tests)</button>
-      </div>
+      <div class="form-row" style="margin-bottom:0;"><button class="btn btn-danger" onclick="resetApp()">🗑️ Remise à zéro (Nettoyer les tests)</button></div>
     </div>
   </div>
-
   <div class="card form-card">
     <div class="radio-group">
       <label class="radio-item"><input type="radio" name="day" value="Samedi 28/11" id="daySat" onchange="saveDay()"> <span>Samedi 28/11</span></label>
       <label class="radio-item"><input type="radio" name="day" value="Dimanche 29/11" id="daySun" onchange="saveDay()"> <span>Dimanche 29/11</span></label>
     </div>
-
     <div class="form-row-2">
       <input type="number" id="startNumber" placeholder="🔢 N° photo de DÉBUT" required>
       <input type="number" id="endNumber" placeholder="🔢 N° photo de FIN (optionnel)">
     </div>
-
     <div class="form-row">
       <input type="text" id="cosplayerName" placeholder="🎭 Nom du cosplayer / Groupe *" required autocapitalize="words">
       <input type="text" id="characterName" placeholder="⚡ Nom du personnage / Univers" autocapitalize="words">
     </div>
-    
     <div class="form-row">
       <input type="email" id="email" placeholder="📧 Email de contact *" required autocapitalize="off" autocorrect="off">
       <input type="text" id="instagram" placeholder="📷 @instagram (optionnel)" autocapitalize="off" autocorrect="off">
     </div>
-    
-    <div class="form-row">
-      <input type="text" id="additionalContact" placeholder="💬 Autre contact (TikTok, X...)" autocapitalize="off">
-    </div>
-
-    <div class="form-row">
-      <textarea id="notes" placeholder="📝 Notes (ex: détails de la tenue)"></textarea>
-    </div>
-
+    <div class="form-row"><input type="text" id="additionalContact" placeholder="💬 Autre contact (TikTok, X...)" autocapitalize="off"></div>
+    <div class="form-row"><textarea id="notes" placeholder="📝 Notes (ex: détails de la tenue)"></textarea></div>
     <div class="form-row" style="margin: 0.5rem 0 1.5rem 0;">
       <label style="display:flex;align-items:center;gap:0.75rem;font-weight:600; cursor: pointer; font-size: 0.95rem;">
-        <input type="checkbox" id="publicRelease" checked style="width: 24px; height: 24px;"> 
-        📢 J'autorise AssoMultiplayer à publier ces médias.
+        <input type="checkbox" id="publicRelease" checked style="width: 24px; height: 24px;"> 📢 J'autorise AssoMultiplayer à publier ces médias.
       </label>
     </div>
-
     <button class="btn btn-primary" id="submitBtn" onclick="saveEntry()">🚀 Envoyer</button>
-    
     <div id="offlineArea" class="offline-container">
       <h4>⚠️ <span id="offlineCount">0</span> en attente d'envoi</h4>
       <ul class="offline-list" id="offlineList"></ul>
       <button class="btn btn-warning" id="syncBtn" onclick="syncOfflineQueue()">🔄 Tenter la synchronisation</button>
       <button class="btn btn-secondary" onclick="downloadBackup()">💾 Télécharger la sauvegarde locale (Secours)</button>
     </div>
-
-    <div class="gdpr-notice">
-      🔒 <strong>RGPD :</strong> Les informations sont enregistrées par AssoMultiplayer pour la gestion des médias du TGS. Elles permettent de vous transmettre vos photos et gérer le droit à l'image. Données non partagées à des tiers.
-    </div>
+    <div class="gdpr-notice">🔒 <strong>RGPD :</strong> Les informations sont enregistrées par AssoMultiplayer pour la gestion des médias du TGS. Elles permettent de vous transmettre vos photos et gérer le droit à l'image. Données non partagées à des tiers.</div>
   </div>
 </div>
-
 <script>
 let offlineQueue = JSON.parse(localStorage.getItem('tgsOfflineQueue') || '[]');
-
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('photographerName').value = localStorage.getItem('tgs_photographer') || '';
   document.getElementById('cameraUsed').value = localStorage.getItem('tgs_camera') || '';
   document.getElementById('startNumber').value = localStorage.getItem('tgs_nextStart') || '';
-  
   const today = new Date();
-  if(today.getMonth() === 10 && today.getDate() === 29) {
-    document.getElementById('daySun').checked = true;
-  } else {
-    document.getElementById('daySat').checked = true;
-  }
+  if(today.getMonth() === 10 && today.getDate() === 29) document.getElementById('daySun').checked = true;
+  else document.getElementById('daySat').checked = true;
   const savedDay = localStorage.getItem('tgs_day');
-  if(savedDay) {
-    const el = document.querySelector(`input[name="day"][value="${savedDay}"]`);
-    if (el) el.checked = true;
-  }
-
+  if(savedDay) { const el = document.querySelector(`input[name="day"][value="${savedDay}"]`); if (el) el.checked = true; }
   if(document.getElementById('photographerName').value && document.getElementById('cameraUsed').value) {
     document.getElementById('configContent').classList.remove('expanded');
     document.getElementById('configContent').classList.add('collapsed');
     document.getElementById('configToggleIcon').textContent = '▶';
   }
-
   updateOfflineUI();
 });
-
 function toggleConfig() {
-  const content = document.getElementById('configContent');
-  const icon = document.getElementById('configToggleIcon');
-  if (content.classList.contains('expanded')) {
-    content.classList.remove('expanded');
-    content.classList.add('collapsed');
-    icon.textContent = '▶';
-  } else {
-    content.classList.remove('collapsed');
-    content.classList.add('expanded');
-    icon.textContent = '▼';
-  }
+  const c = document.getElementById('configContent'), ic = document.getElementById('configToggleIcon');
+  if (c.classList.contains('expanded')) { c.classList.remove('expanded'); c.classList.add('collapsed'); ic.textContent = '▶'; }
+  else { c.classList.remove('collapsed'); c.classList.add('expanded'); ic.textContent = '▼'; }
 }
-
-function autoCollapseConfig() {
-  const p = document.getElementById('photographerName').value;
-  const c = document.getElementById('cameraUsed').value;
-  if(p && c) setTimeout(toggleConfig, 500);
-}
-
-function saveDay() {
-  const d = document.querySelector('input[name="day"]:checked').value;
-  localStorage.setItem('tgs_day', d);
-}
-
-function resetApp() {
-  const isSure = confirm("⚠️ Êtes-vous sûr de vouloir tout effacer ?\n\nCela supprimera votre configuration, le jour sélectionné, et videra complètement la file d'attente hors-ligne.");
-  if(isSure) {
-    localStorage.clear();
-    alert("Application réinitialisée avec succès.");
-    window.location.reload();
-  }
-}
-
+function autoCollapseConfig() { if (document.getElementById('photographerName').value && document.getElementById('cameraUsed').value) setTimeout(toggleConfig, 500); }
+function saveDay() { localStorage.setItem('tgs_day', document.querySelector('input[name="day"]:checked').value); }
+function resetApp() { if (confirm("⚠️ Tout effacer ?")) { localStorage.clear(); window.location.reload(); } }
 function downloadBackup() {
-  if (offlineQueue.length === 0) {
-    alert("Il n'y a aucune donnée hors-ligne à sauvegarder.");
-    return;
-  }
-  const blobText = JSON.stringify(offlineQueue, null, 2);
-  const blob = new Blob([blobText], {type:'application/json'});
-  const a = document.createElement('a'); 
-  a.href = URL.createObjectURL(blob);
-  a.download = `TGS-Backup-Secours-${new Date().toISOString().split('T')[0]}.json`; 
-  a.click();
+  if (offlineQueue.length === 0) return alert("Aucune donnée hors-ligne.");
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(offlineQueue, null, 2)], {type:'application/json'}));
+  a.download = `TGS-Backup-Secours-${new Date().toISOString().split('T')[0]}.json`; a.click();
 }
-
 function updateOfflineUI() {
-  const area = document.getElementById('offlineArea');
-  const count = document.getElementById('offlineCount');
-  const list = document.getElementById('offlineList');
-  
+  const area = document.getElementById('offlineArea'), count = document.getElementById('offlineCount'), list = document.getElementById('offlineList');
   if (offlineQueue.length > 0) {
-    area.style.display = 'block';
-    count.textContent = offlineQueue.length;
-    list.innerHTML = '';
-    offlineQueue.forEach(log => {
-      const li = document.createElement('li');
-      li.textContent = `${log.cosplayerName} (Photos ${log.startNumber}${log.endNumber ? '-'+log.endNumber : ''}) - ${log.timestamp}`;
-      list.appendChild(li);
-    });
-  } else {
-    area.style.display = 'none';
-  }
+    area.style.display = 'block'; count.textContent = offlineQueue.length; list.innerHTML = '';
+    offlineQueue.forEach(log => { const li = document.createElement('li'); li.textContent = `${log.cosplayerName} (Photos ${log.startNumber}${log.endNumber ? '-'+log.endNumber : ''}) - ${log.timestamp}`; list.appendChild(li); });
+  } else area.style.display = 'none';
 }
-
-function showSuccess() {
-  const overlay = document.getElementById('successOverlay');
-  overlay.classList.add('show');
-  setTimeout(() => { overlay.classList.remove('show'); }, 1500);
-}
-
+function showSuccess() { const overlay = document.getElementById('successOverlay'); overlay.classList.add('show'); setTimeout(() => overlay.classList.remove('show'), 1500); }
 async function syncOfflineQueue() {
   if (offlineQueue.length === 0) return;
-  const btn = document.getElementById('syncBtn');
-  btn.disabled = true;
-  btn.textContent = '🔄 Synchronisation en cours...';
-  const scriptUrl = TGSSync.getScriptUrl();
-
-  let remainingQueue = [];
+  const btn = document.getElementById('syncBtn'); btn.disabled = true; btn.textContent = '🔄 Synchronisation en cours...';
+  const scriptUrl = TGSSync.getScriptUrl(); let remaining = [];
   for (let i = 0; i < offlineQueue.length; i++) {
-    try {
-      await fetch(scriptUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(offlineQueue[i])
-      });
-    } catch (error) {
-      remainingQueue.push(offlineQueue[i]);
-    }
+    try { await fetch(scriptUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(offlineQueue[i]) }); }
+    catch (e) { remaining.push(offlineQueue[i]); }
   }
-
-  const successfullySynced = offlineQueue.length - remainingQueue.length;
-  offlineQueue = remainingQueue;
-  localStorage.setItem('tgsOfflineQueue', JSON.stringify(offlineQueue));
-  updateOfflineUI();
-  
-  btn.disabled = false;
-  btn.textContent = '🔄 Tenter la synchronisation';
-  
-  if (offlineQueue.length === 0 && successfullySynced > 0) {
-    showSuccess();
-  } else if (offlineQueue.length > 0) {
-    alert("La connexion internet semble toujours instable. Certaines données restent en attente.");
-  }
+  const synced = offlineQueue.length - remaining.length;
+  offlineQueue = remaining; localStorage.setItem('tgsOfflineQueue', JSON.stringify(offlineQueue)); updateOfflineUI();
+  btn.disabled = false; btn.textContent = '🔄 Tenter la synchronisation';
+  if (offlineQueue.length === 0 && synced > 0) showSuccess();
 }
-
 async function saveEntry(){
-  const photog = document.getElementById('photographerName').value.trim();
-  const cam = document.getElementById('cameraUsed').value.trim();
-  const startNum = document.getElementById('startNumber').value.trim();
-  const endNum = document.getElementById('endNumber').value.trim();
-  const cos = document.getElementById('cosplayerName').value.trim();
-  let em = document.getElementById('email').value.trim();
+  const photog = document.getElementById('photographerName').value.trim(), cam = document.getElementById('cameraUsed').value.trim();
+  const startNum = document.getElementById('startNumber').value.trim(), endNum = document.getElementById('endNumber').value.trim();
+  const cos = document.getElementById('cosplayerName').value.trim(), em = document.getElementById('email').value.trim();
   let insta = document.getElementById('instagram').value.trim();
-  const pub = document.getElementById('publicRelease');
-  const btn = document.getElementById('submitBtn');
-  const scriptUrl = TGSSync.getScriptUrl();
-
-  if(!photog || !cam || !startNum || !cos || !em){
-    alert("⚠️ Config (Nom, Appareil, N° Début) et Infos Cosplayer (Nom, Email) obligatoires.");
-    if(!photog || !cam) {
-      document.getElementById('configContent').classList.remove('collapsed');
-      document.getElementById('configContent').classList.add('expanded');
-      document.getElementById('configToggleIcon').textContent = '▼';
-    }
-    return;
-  }
-
-  if(insta && !insta.startsWith('@') && !insta.includes('instagram.com')) {
-    insta = '@' + insta;
-  }
-
-  let nextStartValue = endNum ? parseInt(endNum, 10) + 1 : parseInt(startNum, 10) + 1;
-
+  const pub = document.getElementById('publicRelease'), btn = document.getElementById('submitBtn'), scriptUrl = TGSSync.getScriptUrl();
+  if(!photog || !cam || !startNum || !cos || !em) { alert("⚠️ Champs obligatoires manquants."); return; }
+  if(insta && !insta.startsWith('@') && !insta.includes('instagram.com')) insta = '@' + insta;
+  const nextStartValue = endNum ? parseInt(endNum, 10) + 1 : parseInt(startNum, 10) + 1;
   const logData = {
-    id: Date.now(),
-    action: 'log_photo',
-    photographerName: photog,
-    cameraUsed: cam,
-    startNumber: startNum,
-    endNumber: endNum,
-    cosplayerName: cos,
-    characterName: document.getElementById('characterName').value.trim(),
-    email: em,
-    instagram: insta,
-    additionalContact: document.getElementById('additionalContact').value.trim(),
-    notes: document.getElementById('notes').value.trim(),
-    publicRelease: pub.checked ? 'Oui' : 'Non',
-    timestamp: new Date().toLocaleString('fr-FR'),
-    day: document.querySelector('input[name="day"]:checked').value
+    id: Date.now(), action: 'log_photo', photographerName: photog, cameraUsed: cam, startNumber: startNum, endNumber: endNum,
+    cosplayerName: cos, characterName: document.getElementById('characterName').value.trim(), email: em, instagram: insta,
+    additionalContact: document.getElementById('additionalContact').value.trim(), notes: document.getElementById('notes').value.trim(),
+    publicRelease: pub.checked ? 'Oui' : 'Non', timestamp: new Date().toLocaleString('fr-FR'), day: document.querySelector('input[name="day"]:checked').value
   };
-
-  btn.disabled = true;
-  btn.textContent = '⏳...';
-
+  btn.disabled = true; btn.textContent = '⏳...';
   try {
-    await fetch(scriptUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(logData)
-    });
-    // Optimistically bump cached total count so local widget updates immediately
-    const cache = TGSSync.getStatsCache() || { totalCount: 0 };
-    cache.totalCount = (cache.totalCount || 0) + 1;
-    cache.latest = { cosplayerName: cos, characterName: logData.characterName };
-    localStorage.setItem('tgs_photo_stats_cache', JSON.stringify(cache));
-    TGSSync.broadcast('photo_logged', logData);
-    showSuccess();
+    await fetch(scriptUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logData) });
+    TGSSync.broadcast('photo_logged', logData); showSuccess();
   } catch (error) {
-    offlineQueue.push(logData);
-    localStorage.setItem('tgsOfflineQueue', JSON.stringify(offlineQueue));
-    TGSSync.broadcast('photo_logged', logData);
-    updateOfflineUI();
+    offlineQueue.push(logData); localStorage.setItem('tgsOfflineQueue', JSON.stringify(offlineQueue)); TGSSync.broadcast('photo_logged', logData); updateOfflineUI();
   }
-
-  localStorage.setItem('tgs_photographer', photog);
-  localStorage.setItem('tgs_camera', cam);
-  localStorage.setItem('tgs_nextStart', nextStartValue);
-
-  ['cosplayerName','characterName','email','instagram','additionalContact','notes', 'endNumber'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('startNumber').value = nextStartValue;
-  pub.checked = true;
-  
-  btn.disabled = false;
-  btn.textContent = '🚀 Envoyer';
+  localStorage.setItem('tgs_photographer', photog); localStorage.setItem('tgs_camera', cam); localStorage.setItem('tgs_nextStart', nextStartValue);
+  ['cosplayerName','characterName','email','instagram','additionalContact','notes', 'endNumber'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('startNumber').value = nextStartValue; pub.checked = true; btn.disabled = false; btn.textContent = '🚀 Envoyer';
   document.getElementById('startNumber').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 </script>

@@ -10,12 +10,7 @@ const ongoingActivities = [
 const defaultAnnouncement = "NON, DOMINO!!! IL TAPE DE NOUVEAU DANS LES CROCQUETTES CE GROS CHAT!";
 
 // OPTIONAL DEFAULT LOGOS BY HOST NAME (Used automatically if event.logo is empty)
-// Example: "JakssDio": "logos/jakssdio.png"
-// Any host without a logo automatically falls back to "NewLogoMP_Seri1coul_Noir.png"!
-const defaultHostLogos = {
-    // "JakssDio": "logos/jakssdio.png",
-    // "CandiCrochettes": "assets/CandiCrochettes Promo.jpg"
-};
+const defaultHostLogos = {};
 
 // EDIT MAIN SCHEDULE HERE
 const events = [
