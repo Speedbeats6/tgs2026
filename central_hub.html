@@ -45,7 +45,8 @@
   .hub-chrono-readout { background:#1e293b; border:1px solid #f59e0b; color:#fbbf24; font-weight:900; font-size:0.95em; padding:4px 10px; border-radius:8px; min-width:54px; text-align:center; }
   .schedule-card { background:#0f172a; border-left:4px solid #8b5cf6; padding:7px 9px; border-radius:8px; margin-bottom:6px; font-size:0.8em; display:flex; justify-content:space-between; align-items:center; gap:6px; }
   .schedule-card.is-live { border-left-color:#10b981; background:rgba(16,185,129,0.12); }
-  .btn-xs { padding:3px 7px; font-size:0.72em; border-radius:6px; }
+  .btn-xs { padding:4px 7px; font-size:0.72em; border-radius:6px; }
+  .card-actions { display:flex; gap:4px; flex-shrink:0; align-items:center; }
   .list-item { background:#0f172a; padding:7px 10px; border-radius:9px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center; font-size:0.8em; border:1px solid #334155; gap:6px; }
   .badge { background:#10b981; color:#042f2e; padding:2px 7px; border-radius:6px; font-size:0.72em; font-weight:900; }
   .summary-grid { display:grid; grid-template-columns:1fr; gap:5px; margin-bottom:8px; max-height:110px; overflow-y:auto; }
@@ -57,6 +58,7 @@
   .kpi-lbl { font-size:0.68em; color:#94a3b8; font-weight:700; text-transform:uppercase; }
   .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.75); display:none; align-items:center; justify-content:center; z-index:999; }
   .modal-card { background:#1e293b; border:1px solid #475569; border-radius:16px; padding:20px; width:92%; max-width:520px; }
+  .field-lbl { font-size:0.76em; color:#cbd5e1; font-weight:700; display:block; margin-bottom:3px; }
   @media (max-width: 1100px) { body { height:auto; overflow:auto; } .main-grid { grid-template-columns:1fr; } }
 </style>
 </head>
@@ -143,7 +145,7 @@
       <h2><span>📅 Planning & Animation Live</span><button class="btn-xs" style="background:#475569;" onclick="resetScheduleToDefault()">↺ Reset JS</button></h2>
       <div class="section-box">
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;">
-          <select id="newDay"><option value="Saturday">Samedi 28</option><option value="Sunday">Dimanche 29</option></select>
+          <select id="newDay"><option value="Saturday">Samedi</option><option value="Sunday">Dimanche</option></select>
           <input type="text" id="newStart" placeholder="Début (14:00)">
           <input type="text" id="newEnd" placeholder="Fin (15:00)">
         </div>
@@ -151,7 +153,7 @@
           <input type="text" id="newEventName" placeholder="Nom animation / Quizz">
           <input type="text" id="newHosts" placeholder="Hôtes (ex: Samir)">
         </div>
-        <input type="text" id="newLogo" placeholder="Logo hôte/event (ex: logos/jakssdio.png — vide = Logo Asso)">
+        <input type="text" id="newLogo" placeholder="Logo hôte/event (ex: logos/pokemon.svg — vide = Logo Asso)">
         <div style="display:flex; gap:6px; align-items:center;">
           <label style="font-size:0.78em; display:flex; align-items:center; gap:5px; cursor:pointer; flex:1;"><input type="checkbox" id="newAllowReg" style="width:auto; margin:0;"> Inscription Quizz/Tournoi ouverte</label>
           <button style="background:#10b981; padding:7px 14px;" onclick="addEvent()">➕ Ajouter</button>
@@ -203,16 +205,82 @@
   </div>
 </div>
 
+<!-- Modal Configuration URLs -->
 <div class="modal-backdrop" id="settingsModal">
   <div class="modal-card">
     <h2 style="margin-bottom:12px;">⚙️ Configuration URLs</h2>
-    <label style="font-size:0.8em; color:#cbd5e1; display:block; margin-bottom:4px;">URL de base publique (GitHub Pages) :</label>
+    <label class="field-lbl">URL de base publique (GitHub Pages) :</label>
     <input type="text" id="cfgPublicUrl" placeholder="https://speedbeats6.github.io/tgs2026">
-    <label style="font-size:0.8em; color:#cbd5e1; display:block; margin-bottom:4px;">URL Google Apps Script :</label>
+    <label class="field-lbl">URL Google Apps Script :</label>
     <input type="text" id="cfgGasUrl" placeholder="https://script.google.com/macros/s/.../exec">
     <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
       <button style="background:#475569;" onclick="closeSettings()">Annuler</button>
       <button style="background:#10b981;" onclick="saveSettings()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Édition Animation / Planning -->
+<div class="modal-backdrop" id="editEventModal">
+  <div class="modal-card">
+    <h2 style="margin-bottom:12px;">✏️ Modifier l'Animation</h2>
+    <input type="hidden" id="editEventIdx">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
+      <div>
+        <label class="field-lbl">Jour :</label>
+        <select id="editEventDay"><option value="Saturday">Samedi</option><option value="Sunday">Dimanche</option></select>
+      </div>
+      <div>
+        <label class="field-lbl">Début :</label>
+        <input type="text" id="editEventStart" placeholder="14:00">
+      </div>
+      <div>
+        <label class="field-lbl">Fin :</label>
+        <input type="text" id="editEventEnd" placeholder="15:00">
+      </div>
+    </div>
+    <label class="field-lbl">Nom de l'animation / Quizz :</label>
+    <input type="text" id="editEventName" placeholder="Nom animation">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+      <div>
+        <label class="field-lbl">Hôte(s) :</label>
+        <input type="text" id="editEventHosts" placeholder="Ex: Samir & John">
+      </div>
+      <div>
+        <label class="field-lbl">Logo (chemin relatif) :</label>
+        <input type="text" id="editEventLogo" placeholder="Ex: logos/pokemon.svg">
+      </div>
+    </div>
+    <label style="font-size:0.82em; display:flex; align-items:center; gap:6px; cursor:pointer; margin:6px 0 12px 0;">
+      <input type="checkbox" id="editEventReg" style="width:auto; margin:0;"> 📝 Inscription Quizz / Tournoi ouverte au public
+    </label>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button style="background:#475569;" onclick="closeEditEventModal()">Annuler</button>
+      <button style="background:#10b981;" onclick="saveEditedEvent()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Édition Activité en Continu -->
+<div class="modal-backdrop" id="editOngoingModal">
+  <div class="modal-card">
+    <h2 style="margin-bottom:12px;">✏️ Modifier l'Activité en Continu</h2>
+    <input type="hidden" id="editOngoingIdx">
+    <div style="display:grid; grid-template-columns:80px 1fr; gap:6px;">
+      <div>
+        <label class="field-lbl">Icône :</label>
+        <input type="text" id="editOngoingIcon" maxlength="6" placeholder="🎮">
+      </div>
+      <div>
+        <label class="field-lbl">Nom de l'activité :</label>
+        <input type="text" id="editOngoingName" placeholder="Freeplay Gaming">
+      </div>
+    </div>
+    <label class="field-lbl">Description :</label>
+    <input type="text" id="editOngoingDesc" placeholder="Description courte...">
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+      <button style="background:#475569;" onclick="closeEditOngoingModal()">Annuler</button>
+      <button style="background:#10b981;" onclick="saveEditedOngoing()">💾 Enregistrer</button>
     </div>
   </div>
 </div>
@@ -311,7 +379,19 @@ function refreshScheduleUI() {
     const live = isEventCurrentlyHappening(e), reg = isEventRegistrable(e);
     const optM = document.createElement('option'); optM.value = e.id; optM.textContent = `[${e.day === 'Saturday' ? 'Sam' : 'Dim'}] ${e.startTime} - ${e.event}`; manualSel.appendChild(optM);
     if (reg) { const optF = document.createElement('option'); optF.value = `${e.day} - ${e.startTime} - ${e.event}`; optF.textContent = `[${e.day === 'Saturday' ? 'Sam' : 'Dim'}] ${e.startTime} - ${e.event}`; filterSel.appendChild(optF); }
-    return `<div class="schedule-card ${live ? 'is-live' : ''}"><div><div style="font-size:0.75em; color:${live ? '#34d399' : '#a78bfa'}; font-weight:800;">${live ? '🔴 EN COURS • ' : ''}${e.day === 'Saturday' ? 'Samedi' : 'Dimanche'} ${e.startTime} - ${e.endTime}${reg ? ' • <span style="color:#60a5fa;">📝 Quiz ON</span>' : ''}</div><div style="font-weight:900; margin-top:2px;">${e.event}</div>${e.hosts ? `<div style="font-size:0.76em; color:#94a3b8;">👥 ${e.hosts}</div>` : ''}</div><div style="display:flex; flex-direction:column; gap:4px;"><button class="btn-xs" style="background:#7c3aed;" onclick="forceEventOnOverlay(${e.id})">📺 Live</button><button class="btn-xs" style="background:#ef4444;" onclick="deleteEvent(${idx})">🗑️</button></div></div>`;
+    return `<div class="schedule-card ${live ? 'is-live' : ''}">
+      <div style="min-width:0;">
+        <div style="font-size:0.75em; color:${live ? '#34d399' : '#a78bfa'}; font-weight:800;">${live ? '🔴 EN COURS • ' : ''}${e.day === 'Saturday' ? 'Samedi' : 'Dimanche'} ${e.startTime} - ${e.endTime}${reg ? ' • <span style="color:#60a5fa;">📝 Quiz ON</span>' : ''}</div>
+        <div style="font-weight:900; margin-top:2px;">${e.event}</div>
+        ${e.hosts ? `<div style="font-size:0.76em; color:#94a3b8;">👥 ${e.hosts}</div>` : ''}
+        <div style="font-size:0.7em; color:#64748b;">🖼️ ${e.logo ? e.logo : 'Logo Asso (défaut)'}</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-xs" style="background:#7c3aed;" onclick="forceEventOnOverlay(${e.id})" title="Forcer sur l'overlay">📺</button>
+        <button class="btn-xs" style="background:#0284c7;" onclick="openEditEventModal(${idx})" title="Modifier cette animation">✏️</button>
+        <button class="btn-xs" style="background:#ef4444;" onclick="deleteEvent(${idx})" title="Supprimer">🗑️</button>
+      </div>
+    </div>`;
   }).join('');
   if (prevM) manualSel.value = prevM;
   if (prevF) filterSel.value = prevF;
@@ -321,9 +401,55 @@ function addEvent() {
   const day = document.getElementById('newDay').value, startTime = document.getElementById('newStart').value.trim(), endTime = document.getElementById('newEnd').value.trim(), eventName = document.getElementById('newEventName').value.trim(), hosts = document.getElementById('newHosts').value.trim(), logo = document.getElementById('newLogo').value.trim(), registrable = document.getElementById('newAllowReg').checked;
   if (!startTime || !endTime || !eventName) return alert('⚠️ Champs obligatoires.');
   localEventsList.push({ id: Date.now(), day, startTime, endTime, event: eventName, hosts: hosts || null, logo: logo || null, registrable });
-  localStorage.setItem('tgs_custom_events_dirty', '1'); TGSSync.saveEvents(localEventsList); refreshScheduleUI();
+  localStorage.setItem('tgs_custom_events_dirty', '1');
+  localEventsList = TGSSync.saveEvents(localEventsList);
+  refreshScheduleUI();
   ['newStart','newEnd','newEventName','newHosts','newLogo'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('newAllowReg').checked = false;
+}
+function openEditEventModal(idx) {
+  const ev = localEventsList[idx];
+  if (!ev) return;
+  document.getElementById('editEventIdx').value = idx;
+  document.getElementById('editEventDay').value = ev.day || 'Saturday';
+  document.getElementById('editEventStart').value = ev.startTime || '';
+  document.getElementById('editEventEnd').value = ev.endTime || '';
+  document.getElementById('editEventName').value = ev.event || '';
+  document.getElementById('editEventHosts').value = ev.hosts || '';
+  document.getElementById('editEventLogo').value = ev.logo || '';
+  document.getElementById('editEventReg').checked = isEventRegistrable(ev);
+  document.getElementById('editEventModal').style.display = 'flex';
+}
+function closeEditEventModal() {
+  document.getElementById('editEventModal').style.display = 'none';
+}
+function saveEditedEvent() {
+  const idx = parseInt(document.getElementById('editEventIdx').value, 10);
+  const existing = localEventsList[idx];
+  if (!existing) return closeEditEventModal();
+  const day = document.getElementById('editEventDay').value;
+  const startTime = document.getElementById('editEventStart').value.trim();
+  const endTime = document.getElementById('editEventEnd').value.trim();
+  const eventName = document.getElementById('editEventName').value.trim();
+  const hosts = document.getElementById('editEventHosts').value.trim();
+  const logo = document.getElementById('editEventLogo').value.trim();
+  const registrable = document.getElementById('editEventReg').checked;
+  if (!startTime || !endTime || !eventName) return alert('⚠️ Le jour, les heures et le nom sont obligatoires.');
+
+  localEventsList[idx] = {
+    ...existing,
+    day,
+    startTime,
+    endTime,
+    event: eventName,
+    hosts: hosts || null,
+    logo: logo || null,
+    registrable
+  };
+  localStorage.setItem('tgs_custom_events_dirty', '1');
+  localEventsList = TGSSync.saveEvents(localEventsList);
+  refreshScheduleUI();
+  closeEditEventModal();
 }
 function switchCol2Tab(tab) {
   const isSched = tab === 'SCHEDULE';
@@ -335,7 +461,7 @@ function switchCol2Tab(tab) {
 function refreshOngoingUI() {
   const feed = document.getElementById('ongoingFeed');
   if (!feed) return;
-  feed.innerHTML = localOngoingList.map((act, idx) => `<div class="schedule-card" style="border-left-color:#38bdf8;"><div style="display:flex; align-items:center; gap:10px;"><span style="font-size:1.6em;">${act.icon || '🎮'}</span><div><div style="font-weight:900;">${act.name}</div><div style="font-size:0.78em; color:#94a3b8;">${act.desc || ''}</div></div></div><div style="display:flex; gap:4px;"><button class="btn-xs" style="background:#0284c7;" onclick="editOngoingActivity(${idx})">✏️</button><button class="btn-xs" style="background:#ef4444;" onclick="deleteOngoingActivity(${idx})">🗑️</button></div></div>`).join('');
+  feed.innerHTML = localOngoingList.map((act, idx) => `<div class="schedule-card" style="border-left-color:#38bdf8;"><div style="display:flex; align-items:center; gap:10px; min-width:0;"><span style="font-size:1.6em;">${act.icon || '🎮'}</span><div style="min-width:0;"><div style="font-weight:900;">${act.name}</div><div style="font-size:0.78em; color:#94a3b8;">${act.desc || ''}</div></div></div><div class="card-actions"><button class="btn-xs" style="background:#0284c7;" onclick="openEditOngoingModal(${idx})" title="Modifier">✏️</button><button class="btn-xs" style="background:#ef4444;" onclick="deleteOngoingActivity(${idx})" title="Supprimer">🗑️</button></div></div>`).join('');
 }
 function addOngoingActivity() {
   const icon = document.getElementById('newOngoingIcon').value.trim() || '🎮', name = document.getElementById('newOngoingName').value.trim(), desc = document.getElementById('newOngoingDesc').value.trim();
@@ -344,13 +470,30 @@ function addOngoingActivity() {
   localStorage.setItem('tgs_custom_ongoing_dirty', '1'); TGSSync.saveOngoingActivities(localOngoingList); refreshOngoingUI();
   ['newOngoingIcon','newOngoingName','newOngoingDesc'].forEach(id => document.getElementById(id).value = '');
 }
-function editOngoingActivity(index) {
-  const act = localOngoingList[index]; if (!act) return;
-  const newIcon = prompt("Icône :", act.icon || '🎮'); if (newIcon === null) return;
-  const newName = prompt("Nom :", act.name); if (newName === null || !newName.trim()) return;
-  const newDesc = prompt("Description :", act.desc || ''); if (newDesc === null) return;
-  localOngoingList[index] = { icon: newIcon.trim() || '🎮', name: newName.trim(), desc: newDesc.trim() };
-  localStorage.setItem('tgs_custom_ongoing_dirty', '1'); TGSSync.saveOngoingActivities(localOngoingList); refreshOngoingUI();
+function openEditOngoingModal(index) {
+  const act = localOngoingList[index];
+  if (!act) return;
+  document.getElementById('editOngoingIdx').value = index;
+  document.getElementById('editOngoingIcon').value = act.icon || '🎮';
+  document.getElementById('editOngoingName').value = act.name || '';
+  document.getElementById('editOngoingDesc').value = act.desc || '';
+  document.getElementById('editOngoingModal').style.display = 'flex';
+}
+function closeEditOngoingModal() {
+  document.getElementById('editOngoingModal').style.display = 'none';
+}
+function saveEditedOngoing() {
+  const index = parseInt(document.getElementById('editOngoingIdx').value, 10);
+  if (!localOngoingList[index]) return closeEditOngoingModal();
+  const icon = document.getElementById('editOngoingIcon').value.trim() || '🎮';
+  const name = document.getElementById('editOngoingName').value.trim();
+  const desc = document.getElementById('editOngoingDesc').value.trim();
+  if (!name) return alert('⚠️ Le nom de l'activité est obligatoire.');
+  localOngoingList[index] = { icon, name, desc };
+  localStorage.setItem('tgs_custom_ongoing_dirty', '1');
+  TGSSync.saveOngoingActivities(localOngoingList);
+  refreshOngoingUI();
+  closeEditOngoingModal();
 }
 function deleteOngoingActivity(index) {
   if (confirm("Supprimer cette activité ?")) { localOngoingList.splice(index, 1); localStorage.setItem('tgs_custom_ongoing_dirty', '1'); TGSSync.saveOngoingActivities(localOngoingList); refreshOngoingUI(); }
@@ -359,10 +502,10 @@ function resetOngoingToDefault() {
   if (confirm("Réinitialiser les activités en continu ?")) { localStorage.removeItem('tgs_custom_ongoing'); localStorage.removeItem('tgs_custom_ongoing_dirty'); localOngoingList = TGSSync.getOngoingActivities(); TGSSync.saveOngoingActivities(localOngoingList); refreshOngoingUI(); }
 }
 function deleteEvent(index) {
-  if (confirm('Supprimer cette animation ?')) { localEventsList.splice(index, 1); localStorage.setItem('tgs_custom_events_dirty', '1'); TGSSync.saveEvents(localEventsList); refreshScheduleUI(); }
+  if (confirm('Supprimer cette animation ?')) { localEventsList.splice(index, 1); localStorage.setItem('tgs_custom_events_dirty', '1'); localEventsList = TGSSync.saveEvents(localEventsList); refreshScheduleUI(); }
 }
 function resetScheduleToDefault() {
-  if (confirm('Réinitialiser le planning ?')) { localStorage.removeItem('tgs_custom_events'); localStorage.removeItem('tgs_custom_events_dirty'); localEventsList = TGSSync.getEvents(); TGSSync.saveEvents(localEventsList); refreshScheduleUI(); }
+  if (confirm('Réinitialiser le planning ?')) { localStorage.removeItem('tgs_custom_events'); localStorage.removeItem('tgs_custom_events_dirty'); localEventsList = TGSSync.getEvents(); localEventsList = TGSSync.saveEvents(localEventsList); refreshScheduleUI(); }
 }
 function getCompanionUrl() { const base = TGSSync.getPublicBaseUrl() || DEFAULT_PUBLIC_BASE_URL; return `${base}/public_companion.html`; }
 function generateQRCode() {
