@@ -205,7 +205,6 @@
   </div>
 </div>
 
-<!-- Modal Configuration URLs -->
 <div class="modal-backdrop" id="settingsModal">
   <div class="modal-card">
     <h2 style="margin-bottom:12px;">⚙️ Configuration URLs</h2>
@@ -220,7 +219,6 @@
   </div>
 </div>
 
-<!-- Modal Édition Animation / Planning -->
 <div class="modal-backdrop" id="editEventModal">
   <div class="modal-card">
     <h2 style="margin-bottom:12px;">✏️ Modifier l'Animation</h2>
@@ -261,7 +259,6 @@
   </div>
 </div>
 
-<!-- Modal Édition Activité en Continu -->
 <div class="modal-backdrop" id="editOngoingModal">
   <div class="modal-card">
     <h2 style="margin-bottom:12px;">✏️ Modifier l'Activité en Continu</h2>
@@ -287,6 +284,17 @@
 
 <script>
 let localEventsList = [], localOngoingList = [], allSelected = false, hubChronoInterval = null;
+let quizSummaryNames = [], regActionItems = [];
+
+function escAttr(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   localEventsList = TGSSync.getEvents();
   localOngoingList = TGSSync.getOngoingActivities();
@@ -305,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(() => { if (!TGSSync.isOfflineMode()) syncAllCloud(false); }, 8000);
   setInterval(() => { renderRegistrations(); refreshPhotoStatsUI(); refreshScheduleUI(); }, 3500);
 });
+
 function startHubChrono(seconds) {
   stopHubChrono(false); TGSSync.triggerTimer(seconds);
   let left = seconds; const el = document.getElementById('hubChronoDisplay'); el.textContent = left + 's';
@@ -382,12 +391,12 @@ function refreshScheduleUI() {
     return `<div class="schedule-card ${live ? 'is-live' : ''}">
       <div style="min-width:0;">
         <div style="font-size:0.75em; color:${live ? '#34d399' : '#a78bfa'}; font-weight:800;">${live ? '🔴 EN COURS • ' : ''}${e.day === 'Saturday' ? 'Samedi' : 'Dimanche'} ${e.startTime} - ${e.endTime}${reg ? ' • <span style="color:#60a5fa;">📝 Quiz ON</span>' : ''}</div>
-        <div style="font-weight:900; margin-top:2px;">${e.event}</div>
-        ${e.hosts ? `<div style="font-size:0.76em; color:#94a3b8;">👥 ${e.hosts}</div>` : ''}
-        <div style="font-size:0.7em; color:#64748b;">🖼️ ${e.logo ? e.logo : 'Logo Asso (défaut)'}</div>
+        <div style="font-weight:900; margin-top:2px;">${escAttr(e.event)}</div>
+        ${e.hosts ? `<div style="font-size:0.76em; color:#94a3b8;">👥 ${escAttr(e.hosts)}</div>` : ''}
+        <div style="font-size:0.7em; color:#64748b;">🖼️ ${e.logo ? escAttr(e.logo) : 'Logo Asso (défaut)'}</div>
       </div>
       <div class="card-actions">
-        <button class="btn-xs" style="background:#7c3aed;" onclick="forceEventOnOverlay(${e.id})" title="Forcer sur l'overlay">📺</button>
+        <button class="btn-xs" style="background:#7c3aed;" onclick="forceEventOnOverlay(${Number(e.id)})" title="Forcer sur l'overlay">📺</button>
         <button class="btn-xs" style="background:#0284c7;" onclick="openEditEventModal(${idx})" title="Modifier cette animation">✏️</button>
         <button class="btn-xs" style="background:#ef4444;" onclick="deleteEvent(${idx})" title="Supprimer">🗑️</button>
       </div>
@@ -461,7 +470,7 @@ function switchCol2Tab(tab) {
 function refreshOngoingUI() {
   const feed = document.getElementById('ongoingFeed');
   if (!feed) return;
-  feed.innerHTML = localOngoingList.map((act, idx) => `<div class="schedule-card" style="border-left-color:#38bdf8;"><div style="display:flex; align-items:center; gap:10px; min-width:0;"><span style="font-size:1.6em;">${act.icon || '🎮'}</span><div style="min-width:0;"><div style="font-weight:900;">${act.name}</div><div style="font-size:0.78em; color:#94a3b8;">${act.desc || ''}</div></div></div><div class="card-actions"><button class="btn-xs" style="background:#0284c7;" onclick="openEditOngoingModal(${idx})" title="Modifier">✏️</button><button class="btn-xs" style="background:#ef4444;" onclick="deleteOngoingActivity(${idx})" title="Supprimer">🗑️</button></div></div>`).join('');
+  feed.innerHTML = localOngoingList.map((act, idx) => `<div class="schedule-card" style="border-left-color:#38bdf8;"><div style="display:flex; align-items:center; gap:10px; min-width:0;"><span style="font-size:1.6em;">${escAttr(act.icon || '🎮')}</span><div style="min-width:0;"><div style="font-weight:900;">${escAttr(act.name)}</div><div style="font-size:0.78em; color:#94a3b8;">${escAttr(act.desc || '')}</div></div></div><div class="card-actions"><button class="btn-xs" style="background:#0284c7;" onclick="openEditOngoingModal(${idx})" title="Modifier">✏️</button><button class="btn-xs" style="background:#ef4444;" onclick="deleteOngoingActivity(${idx})" title="Supprimer">🗑️</button></div></div>`).join('');
 }
 function addOngoingActivity() {
   const icon = document.getElementById('newOngoingIcon').value.trim() || '🎮', name = document.getElementById('newOngoingName').value.trim(), desc = document.getElementById('newOngoingDesc').value.trim();
@@ -517,18 +526,22 @@ function renderQuizCounts(regs) {
   if (!summaryBox) return;
   const counts = new Map();
   regs.forEach(r => { const key = String(r.event || 'Autre'); counts.set(key, (counts.get(key) || 0) + 1); });
-  if (counts.size === 0) {
+  quizSummaryNames = Array.from(counts.keys());
+  if (quizSummaryNames.length === 0) {
     summaryBox.innerHTML = '<div class="summary-row"><span style="color:#94a3b8;">Aucune inscription enregistrée</span><span class="badge" style="background:#334155; color:#e2e8f0;">0</span></div>';
     return;
   }
-  summaryBox.innerHTML = Array.from(counts.entries()).map(([evName, cnt]) => `
-    <div class="summary-row" onclick="filterByQuiz('${evName.replace(/'/g, "\'")}')">
-      <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:82%; font-weight:700;">${evName}</span>
+  summaryBox.innerHTML = quizSummaryNames.map((evName, idx) => {
+    const cnt = counts.get(evName);
+    return `<div class="summary-row" onclick="filterByQuizIndex(${idx})">
+      <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:82%; font-weight:700;">${escAttr(evName)}</span>
       <span class="badge">${cnt} inscrit${cnt > 1 ? 's' : ''}</span>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
-function filterByQuiz(evName) {
+function filterByQuizIndex(idx) {
+  const evName = quizSummaryNames[idx];
+  if (!evName) return;
   const sel = document.getElementById('eventFilter');
   if (!Array.from(sel.options).some(o => o.value === evName)) {
     const opt = document.createElement('option'); opt.value = evName; opt.textContent = evName; sel.appendChild(opt);
@@ -542,22 +555,28 @@ function renderRegistrations() {
   const regFeed = document.getElementById('regFeed');
   const filtered = selectedEvent === 'ALL' ? regs : regs.filter(r => r.event === selectedEvent);
   if (filtered.length === 0) { regFeed.innerHTML = '<div style="text-align:center; color:#64748b; font-size:0.8em; padding:15px;">Aucune inscription pour ce filtre.</div>'; return; }
-  regFeed.innerHTML = filtered.slice().reverse().map((r) => {
+  regActionItems = filtered.slice().reverse().map((r) => {
     const cleanTime = TGSSync.formatTimeLabel(r.timestamp);
     const regKey = String(r.id || `${r.event}_${r.pseudo}_${cleanTime}`);
-    return `
-      <div class="list-item">
-        <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-          <input type="checkbox" class="participant-checkbox" data-key="${regKey}" data-id="${r.id || ''}" data-pseudo="${r.pseudo}" data-event="${r.event}" style="width:16px; height:16px; margin:0; flex-shrink:0;">
-          <div style="min-width:0;"><strong>${r.pseudo}</strong><div style="font-size:0.75em; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.event}</div></div>
-        </div>
-        <div style="display:flex; align-items:center; gap:5px; flex-shrink:0;">
-          <span class="badge" style="background:#3b82f6; color:white;">${cleanTime}</span>
-          <button class="btn-xs" style="background:#ef4444;" onclick="deleteSingleRegistration('${regKey.replace(/'/g, "\'")}', '${String(r.id || '').replace(/'/g, "\'")}', '${String(r.pseudo).replace(/'/g, "\'")}', '${String(r.event).replace(/'/g, "\'")}')" title="Supprimer">🗑️</button>
-        </div>
+    return { regKey, regId: r.id || '', pseudo: r.pseudo, event: r.event, cleanTime };
+  });
+  regFeed.innerHTML = regActionItems.map((item, idx) => `
+    <div class="list-item">
+      <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+        <input type="checkbox" class="participant-checkbox" data-key="${escAttr(item.regKey)}" data-id="${escAttr(item.regId)}" data-pseudo="${escAttr(item.pseudo)}" data-event="${escAttr(item.event)}" style="width:16px; height:16px; margin:0; flex-shrink:0;">
+        <div style="min-width:0;"><strong>${escAttr(item.pseudo)}</strong><div style="font-size:0.75em; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escAttr(item.event)}</div></div>
       </div>
-    `;
-  }).join('');
+      <div style="display:flex; align-items:center; gap:5px; flex-shrink:0;">
+        <span class="badge" style="background:#3b82f6; color:white;">${escAttr(item.cleanTime)}</span>
+        <button class="btn-xs" style="background:#ef4444;" onclick="deleteRegistrationByIndex(${idx})" title="Supprimer">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+async function deleteRegistrationByIndex(idx) {
+  const item = regActionItems[idx];
+  if (!item) return;
+  await deleteSingleRegistration(item.regKey, item.regId, item.pseudo, item.event);
 }
 async function deleteSingleRegistration(regKey, regId, pseudo, eventName) {
   if (!confirm(`Supprimer l'inscription de "${pseudo}" ?`)) return;
@@ -588,10 +607,7 @@ function raffleSelected() {
   if (checked.length === 0) return alert('⚠️ Cochez au moins un participant.');
   fireSound('drumroll');
   const candidates = checked.map(cb => ({ pseudo: cb.getAttribute('data-pseudo'), event: cb.getAttribute('data-event') }));
-  setTimeout(() => { const winner = candidates[Math.floor(Math.random() * candidates.length)]; fireSound('fanfare'); alert(`🎉 GAGNANT :
-
-🏆 ${winner.pseudo}
-🎮 ${winner.event}`); }, 2450);
+  setTimeout(() => { const winner = candidates[Math.floor(Math.random() * candidates.length)]; fireSound('fanfare'); alert(`🎉 GAGNANT :\n\n🏆 ${winner.pseudo}\n🎮 ${winner.event}`); }, 2450);
 }
 function refreshPhotoStatsUI() {
   const localPhotos = TGSSync.getLocalPhotos(), cache = TGSSync.getStatsCache(), offline = TGSSync.isOfflineMode();
@@ -607,8 +623,8 @@ function refreshPhotoStatsUI() {
   photoFeed.innerHTML = recentList.map(p => `
     <div class="list-item">
       <div style="min-width:0;">
-        <strong>${p.cosplayerName || 'Cosplayer'}</strong> ${p.characterName ? `<span style="color:#c4b5fd;">(${p.characterName})</span>` : ''}
-        <div style="font-size:0.74em; color:#94a3b8;">📷 ${p.photographerName || 'Photographe'} • #${p.startNumber || ''}${p.endNumber ? '-' + p.endNumber : ''}</div>
+        <strong>${escAttr(p.cosplayerName || 'Cosplayer')}</strong> ${p.characterName ? `<span style="color:#c4b5fd;">(${escAttr(p.characterName)})</span>` : ''}
+        <div style="font-size:0.74em; color:#94a3b8;">📷 ${escAttr(p.photographerName || 'Photographe')} • #${escAttr(p.startNumber || '')}${p.endNumber ? '-' + escAttr(p.endNumber) : ''}</div>
       </div>
       <span class="badge">OK</span>
     </div>
