@@ -173,6 +173,11 @@ const TGSSync = {
     catch (e) { return []; }
   },
 
+  getStatsCache() {
+    try { return JSON.parse(localStorage.getItem('tgs_photo_stats_cache') || 'null'); }
+    catch (e) { return null; }
+  },
+
   async pushCloudState(payload) {
     if (this.isOfflineMode()) return false;
     const url = this.getScriptUrl();
@@ -213,6 +218,10 @@ const TGSSync = {
 
       window[cbName] = (data) => {
         if (!data || typeof data !== 'object') return finish(null);
+
+        if (data.photoStats && typeof data.photoStats === 'object') {
+          localStorage.setItem('tgs_photo_stats_cache', JSON.stringify(data.photoStats));
+        }
 
         if (Array.isArray(data.registrations)) {
           const deletedIds = new Set(JSON.parse(localStorage.getItem('tgs_deleted_reg_ids') || '[]').map(String));

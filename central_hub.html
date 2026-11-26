@@ -48,9 +48,13 @@
   .btn-xs { padding:3px 7px; font-size:0.72em; border-radius:6px; }
   .list-item { background:#0f172a; padding:7px 10px; border-radius:9px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center; font-size:0.8em; border:1px solid #334155; gap:6px; }
   .badge { background:#10b981; color:#042f2e; padding:2px 7px; border-radius:6px; font-size:0.72em; font-weight:900; }
-  .summary-grid { display:grid; grid-template-columns:1fr; gap:5px; margin-bottom:8px; max-height:145px; overflow-y:auto; }
+  .summary-grid { display:grid; grid-template-columns:1fr; gap:5px; margin-bottom:8px; max-height:110px; overflow-y:auto; }
   .summary-row { background:#0f172a; border:1px solid #334155; border-radius:8px; padding:6px 9px; display:flex; justify-content:space-between; align-items:center; font-size:0.76em; cursor:pointer; }
   .summary-row:hover { border-color:#8b5cf6; }
+  .kpi-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:6px; }
+  .kpi-box { background:#0f172a; border:1px solid #334155; border-radius:10px; padding:6px 8px; text-align:center; }
+  .kpi-val { font-size:1.35em; font-weight:900; color:#34d399; line-height:1.1; }
+  .kpi-lbl { font-size:0.68em; color:#94a3b8; font-weight:700; text-transform:uppercase; }
   .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.75); display:none; align-items:center; justify-content:center; z-index:999; }
   .modal-card { background:#1e293b; border:1px solid #475569; border-radius:16px; padding:20px; width:92%; max-width:520px; }
   @media (max-width: 1100px) { body { height:auto; overflow:auto; } .main-grid { grid-template-columns:1fr; } }
@@ -68,6 +72,7 @@
     <a class="pill pill-link" href="stage_soundboard.html" target="_blank">🎛️ Chrono/Sons</a>
     <a class="pill pill-link" href="index.html" target="_blank">📅 Écran Planning</a>
     <a class="pill pill-link" href="public_companion.html" target="_blank">📱 Page Public</a>
+    <a class="pill pill-link" href="photo_logger.html" target="_blank">📷 Photo Logger</a>
     <button class="pill pill-link" onclick="openSettings()">⚙️ URLs</button>
   </div>
 </div>
@@ -187,7 +192,14 @@
         <button style="background:#ef4444; flex:1; font-size:0.74em;" onclick="deleteSelectedRegistrations()">🗑️ Suppr.</button>
       </div>
     </div>
-    <div class="scroll-area" id="regFeed"></div>
+    <div class="scroll-area" id="regFeed" style="max-height:36%;"></div>
+
+    <h2 style="margin-top:8px;"><span>📸 Stats Photobooth</span><a class="btn-xs" style="background:#0284c7; color:white; text-decoration:none;" href="photo_logger.html" target="_blank">Ouvrir ↗</a></h2>
+    <div class="kpi-row">
+      <div class="kpi-box"><div class="kpi-val" id="hubCloudPhotoCount">0</div><div class="kpi-lbl">Total Passages</div></div>
+      <div class="kpi-box"><div class="kpi-val" style="color:#60a5fa;" id="hubLocalPhotoCount">0</div><div class="kpi-lbl">File Locale</div></div>
+    </div>
+    <div class="scroll-area" id="photoFeed" style="max-height:24%;"></div>
   </div>
 </div>
 
@@ -210,7 +222,7 @@ let localEventsList = [], localOngoingList = [], allSelected = false, hubChronoI
 document.addEventListener('DOMContentLoaded', () => {
   localEventsList = TGSSync.getEvents();
   localOngoingList = TGSSync.getOngoingActivities();
-  refreshScheduleUI(); refreshOngoingUI(); refreshOverlayUI(); renderRegistrations(); generateQRCode();
+  refreshScheduleUI(); refreshOngoingUI(); refreshOverlayUI(); renderRegistrations(); refreshPhotoStatsUI(); generateQRCode();
   updateOnlineStatus(); refreshOfflineButtonUI();
   window.addEventListener('online', () => { updateOnlineStatus(); if (!TGSSync.isOfflineMode()) syncAllCloud(false); });
   window.addEventListener('offline', updateOnlineStatus);
@@ -219,11 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (type === 'ongoing_updated' || type === 'tgs_custom_ongoing') { localOngoingList = TGSSync.getOngoingActivities(); refreshOngoingUI(); }
     if (type === 'overlay_updated' || type === 'tgs_overlay_state') refreshOverlayUI();
     if (type === 'offline_mode_changed') { updateOnlineStatus(); refreshOfflineButtonUI(); }
-    renderRegistrations();
+    renderRegistrations(); refreshPhotoStatsUI();
   });
   if (!TGSSync.isOfflineMode()) syncAllCloud(false);
   setInterval(() => { if (!TGSSync.isOfflineMode()) syncAllCloud(false); }, 8000);
-  setInterval(() => { renderRegistrations(); refreshScheduleUI(); }, 3500);
+  setInterval(() => { renderRegistrations(); refreshPhotoStatsUI(); refreshScheduleUI(); }, 3500);
 });
 function startHubChrono(seconds) {
   stopHubChrono(false); TGSSync.triggerTimer(seconds);
@@ -249,7 +261,7 @@ function toggleOfflineMode() { TGSSync.setOfflineMode(localStorage.getItem('tgs_
 async function syncAllCloud(manual = false) {
   if (TGSSync.isOfflineMode()) { if (manual) alert('🟠 Mode Local actif.'); return; }
   const data = await TGSSync.fetchCloudData('all');
-  if (data) { renderRegistrations(); refreshOverlayUI(); if (manual) alert('✅ Synchronisation réussie !'); }
+  if (data) { renderRegistrations(); refreshPhotoStatsUI(); refreshOverlayUI(); if (manual) alert('✅ Synchronisation réussie !'); }
   else if (manual) alert('⚠️ Connexion Google Sheets indisponible.');
 }
 function refreshOverlayUI() {
@@ -437,6 +449,27 @@ function raffleSelected() {
 
 🏆 ${winner.pseudo}
 🎮 ${winner.event}`); }, 2450);
+}
+function refreshPhotoStatsUI() {
+  const localPhotos = TGSSync.getLocalPhotos(), cache = TGSSync.getStatsCache(), offline = TGSSync.isOfflineMode();
+  const totalCount = (!offline && cache && typeof cache.totalCount === 'number') ? Math.max(cache.totalCount, localPhotos.length) : localPhotos.length;
+  document.getElementById('hubCloudPhotoCount').textContent = totalCount;
+  document.getElementById('hubLocalPhotoCount').textContent = localPhotos.length;
+  const recentList = (!offline && cache && Array.isArray(cache.recent) && cache.recent.length > 0) ? cache.recent : localPhotos.slice(-10).reverse();
+  const photoFeed = document.getElementById('photoFeed');
+  if (recentList.length === 0) {
+    photoFeed.innerHTML = '<div style="text-align:center; color:#64748b; font-size:0.78em; padding:10px;">Aucun passage photo enregistré.</div>';
+    return;
+  }
+  photoFeed.innerHTML = recentList.map(p => `
+    <div class="list-item">
+      <div style="min-width:0;">
+        <strong>${p.cosplayerName || 'Cosplayer'}</strong> ${p.characterName ? `<span style="color:#c4b5fd;">(${p.characterName})</span>` : ''}
+        <div style="font-size:0.74em; color:#94a3b8;">📷 ${p.photographerName || 'Photographe'} • #${p.startNumber || ''}${p.endNumber ? '-' + p.endNumber : ''}</div>
+      </div>
+      <span class="badge">OK</span>
+    </div>
+  `).join('');
 }
 function openSettings() { document.getElementById('cfgPublicUrl').value = TGSSync.getPublicBaseUrl(); document.getElementById('cfgGasUrl').value = TGSSync.getScriptUrl(); document.getElementById('settingsModal').style.display = 'flex'; }
 function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
