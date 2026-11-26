@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs><linearGradient id="g5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#16a34a"/></linearGradient></defs>
+  <rect width="120" height="120" rx="24" fill="url(#g5)"/>
+  <circle cx="60" cy="60" r="38" fill="#ffffff"/>
+  <text x="60" y="74" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="42" fill="#dc2626">M&amp;S</text>
+</svg>
