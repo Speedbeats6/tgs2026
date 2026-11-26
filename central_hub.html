@@ -488,7 +488,7 @@ function saveEditedOngoing() {
   const icon = document.getElementById('editOngoingIcon').value.trim() || '🎮';
   const name = document.getElementById('editOngoingName').value.trim();
   const desc = document.getElementById('editOngoingDesc').value.trim();
-  if (!name) return alert('⚠️ Le nom de l'activité est obligatoire.');
+  if (!name) return alert("⚠️ Le nom de l'activité est obligatoire.");
   localOngoingList[index] = { icon, name, desc };
   localStorage.setItem('tgs_custom_ongoing_dirty', '1');
   TGSSync.saveOngoingActivities(localOngoingList);
