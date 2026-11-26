@@ -1,0 +1,31 @@
+Central Hub (Control Screen): 
+[https://speedbeats6.github.io/tgs2026/central_hub.html]
+(https://speedbeats6.github.io/tgs2026/central_hub.html)   
+
+Permanent Schedule + Corner QR (Schedule Screen): 
+[https://speedbeats6.github.io/tgs2026/index.html]
+(https://speedbeats6.github.io/tgs2026/index.html)   
+
+Streamlabs / OBS Lower Third Overlay: 
+[https://speedbeats6.github.io/tgs2026/streamlabs_lower_third.html?v=11]
+(https://speedbeats6.github.io/tgs2026/streamlabs_lower_third.html?v=11)   
+
+Streamlabs / OBS Standalone QR Overlay: 
+[https://speedbeats6.github.io/tgs2026/streamlabs_qr_overlay.html?v=11]
+(https://speedbeats6.github.io/tgs2026/streamlabs_qr_overlay.html?v=11)   
+
+Stage Soundboard & Chrono: 
+[https://speedbeats6.github.io/tgs2026/stage_soundboard.html]
+(https://speedbeats6.github.io/tgs2026/stage_soundboard.html)   
+
+Public Companion (QR Target): 
+[https://speedbeats6.github.io/tgs2026/public_companion.html]
+(https://speedbeats6.github.io/tgs2026/public_companion.html)   
+
+Cosplay Photo Logger: 
+[https://speedbeats6.github.io/tgs2026/photo_logger.html]
+(https://speedbeats6.github.io/tgs2026/photo_logger.html)   
+
+Google Apps Script Backend (/exec): 
+[https://script.google.com/macros/s/AKfycby6GdH-SOFNLFZPr09gXnguqajQazjOoJnOwParsjnlk0kwEuVm2gzS0q-uXgvHbhfE9g/exec]
+(https://script.google.com/macros/s/AKfycby6GdH-SOFNLFZPr09gXnguqajQazjOoJnOwParsjnlk0kwEuVm2gzS0q-uXgvHbhfE9g/exec)

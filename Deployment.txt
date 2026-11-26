@@ -1,0 +1,44 @@
+Deployment Plan for the Venue Desktop PC
+
+1.Pack the External Hard Drive and Push Final Files to GitHub:
+Before leaving.
+
+Copy your entire working TGS2026_Harddrive folder (including animations/, assets/, logos/, photos/, videos/, and all fixed .html/.js files) onto your external hard drive, and make sure your latest central_hub.html, schedule.js, shared_sync.js, index.html, streamlabs_lower_third.html, and streamlabs_qr_overlay.html are already committed to speedbeats6/tgs2026.
+Verification: Opening 
+[https://speedbeats6.github.io/tgs2026/central_hub.html]
+(https://speedbeats6.github.io/tgs2026/central_hub.html) 
+in a browser loads without console errors and your external drive contains all media folders and HTML/JS files.
+
+2.Connect the Hard Drive and Open Central Hub on the Venue PC:
+2 min.
+
+Plug the external hard drive into the venue desktop PC, open a browser, and go to 
+[https://speedbeats6.github.io/tgs2026/central_hub.html]
+(https://speedbeats6.github.io/tgs2026/central_hub.html). 
+Click ⚙️ URLs in the top bar and confirm:
+URL de base publique: 
+[https://speedbeats6.github.io/tgs2026]
+(https://speedbeats6.github.io/tgs2026)
+URL Google Apps Script: 
+[https://script.google.com/macros/s/AKfycby6GdH-SOFNLFZPr09gXnguqajQazjOoJnOwParsjnlk0kwEuVm2gzS0q-uXgvHbhfE9g/exec]
+(https://script.google.com/macros/s/AKfycby6GdH-SOFNLFZPr09gXnguqajQazjOoJnOwParsjnlk0kwEuVm2gzS0q-uXgvHbhfE9g/exec)
+Verification: The top status pill shows 🟢 En ligne and 🌐 Forcer Local: OFF (or 🟠 Mode Local if the venue network is down, with 🔄 Sync Drive working as soon as internet is available).
+
+3.Configure Streamlabs / OBS Browser Sources:
+2 min.
+In Streamlabs Desktop or OBS on the venue PC, create two Browser Source items set to 1920 × 1080 with Shutdown source when not visible unchecked:
+Lower Third: 
+[https://speedbeats6.github.io/tgs2026/streamlabs_lower_third.html?v=11]
+(https://speedbeats6.github.io/tgs2026/streamlabs_lower_third.html?v=11)
+Standalone QR Overlay: 
+[https://speedbeats6.github.io/tgs2026/streamlabs_qr_overlay.html?v=11]
+(https://speedbeats6.github.io/tgs2026/streamlabs_qr_overlay.html?v=11)
+Verification: Sending a test announcement and toggling the QR overlay in central_hub.html updates both browser sources within a few seconds.
+
+4.Assign the 4 Screens and Local Stage Assets:
+2 min.
+Put 
+[https://speedbeats6.github.io/tgs2026/index.html]
+(https://speedbeats6.github.io/tgs2026/index.html) 
+on your permanent schedule screen (using local drive paths if running offline media), keep central_hub.html (and stage_soundboard.html if needed) on your control display, and open your presentation/audio/media files directly from the animations/ folder on the external hard drive for your stage/stream screens.
+Verification: Every screen shows its intended view, quiz registration counts and photobooth logs appear in the Hub, and local files in animations/ play smoothly from the external drive.
