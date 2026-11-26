@@ -28,7 +28,7 @@ const events = [
     {id: 6, day: 'Saturday', startTime: '14:00', endTime: '15:00', event: "CÉLÉFIAKAKI - Quizz à Ki ? 🤔", hosts: "Samir", logo: "logos/quiz_stage.svg", registrable: true},
     {id: 7, day: 'Saturday', startTime: '15:00', endTime: '16:00', event: "Grand Tournoi Bataille de Pouces 👍", hosts: "John", logo: "logos/quiz_stage.svg", registrable: true},
     {id: 8, day: 'Saturday', startTime: '16:00', endTime: '17:00', event: "Quizz Zelda 🗡️🛡️", hosts: "Samir", logo: "logos/zelda.svg", registrable: true},
-    {id: 9, day: 'Saturday', startTime: '17:00', endTime: '18:00', event: "Croisée Pop Culture 🎬🎮", hosts: "PA", logo: "logos/popculture.svg", registrable: true},
+    {id: 9, day: 'Saturday', startTime: '17:00', endTime: '18:00', event: "Croisée Pop Culture 🎬🎮", hosts: "PA", logo: "logos/popculture.svg", registrable: false},
 
     // DIMANCHE
     {id: 10, day: 'Sunday', startTime: '10:00', endTime: '11:00', event: "Unboxing Cartes Pokémon 🃏", hosts: "PA & JakssDio", logo: "logos/pokemon.svg", registrable: false},
